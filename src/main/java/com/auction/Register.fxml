@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<VBox spacing="12" alignment="CENTER"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.auction.controller.RegisterController"
+      style="-fx-padding: 40; -fx-min-width: 320;">
+
+    <Label text="ĐĂNG KÝ TÀI KHOẢN" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+
+    <TextField fx:id="usernameField" promptText="Tên đăng nhập"/>
+    <PasswordField fx:id="passwordField" promptText="Mật khẩu"/>
+
+    <ComboBox fx:id="roleComboBox" promptText="Chọn vai trò"/>
+
+    <Button text="Đăng ký" onAction="#handleRegister"
+            style="-fx-min-width: 200;"/>
+    <Button text="Quay lại đăng nhập" onAction="#goToLogin"
+            style="-fx-min-width: 200;"/>
+
+    <Label fx:id="errorLabel" style="-fx-text-fill: red;"/>
+</VBox>
