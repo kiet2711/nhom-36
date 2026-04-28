@@ -1,0 +1,6 @@
+target/
+.idea/
+*.iml
+*.class
+auction.db
+.DS_Store
