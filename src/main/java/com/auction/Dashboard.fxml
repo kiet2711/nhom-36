@@ -1,0 +1,14 @@
+<<!-- src/main/resources/com/auction/Dashboard.fxml -->
+        <?xml version="1.0" encoding="UTF-8"?>
+        <?import javafx.scene.layout.*?>
+        <?import javafx.scene.control.*?>
+
+<VBox spacing="16" alignment="CENTER"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.auction.controller.DashboardController"
+      style="-fx-padding: 40; -fx-min-width: 500; -fx-min-height: 400;">
+
+<Label fx:id="welcomeLabel" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+<Label text="(Tuần 3 sẽ hiện danh sách đấu giá ở đây)"/>
+<Button text="Đăng xuất" onAction="#handleLogout"/>
+</VBox>
