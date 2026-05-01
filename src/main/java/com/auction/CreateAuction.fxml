@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<VBox spacing="12" alignment="CENTER"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.auction.controller.CreateAuctionController"
+      style="-fx-padding: 30; -fx-min-width: 400;">
+
+    <Label text="TẠO PHIÊN ĐẤU GIÁ"
+           style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+
+    <TextField fx:id="nameField"    promptText="Tên sản phẩm"/>
+    <TextField fx:id="descField"    promptText="Mô tả"/>
+    <TextField fx:id="priceField"   promptText="Giá khởi điểm (VD: 500000)"/>
+    <ComboBox  fx:id="typeCombo"    promptText="Loại sản phẩm"/>
+    <TextField fx:id="endTimeField" promptText="Kết thúc (VD: 2026-05-01T20:00:00)"/>
+
+    <Button text="Tạo phiên đấu giá" onAction="#handleCreate"
+            style="-fx-font-weight: bold; -fx-min-width: 200;"/>
+    <Button text="← Quay lại" onAction="#handleBack"/>
+
+    <Label fx:id="resultLabel"/>
+</VBox>
