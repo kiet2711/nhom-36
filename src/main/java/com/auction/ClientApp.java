@@ -1,19 +1,16 @@
 package com.auction;
 
+import com.auction.util.SceneManager;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class ClientApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/com/auction/Login.fxml"));
-        Scene scene = new Scene(loader.load());
+        SceneManager.init(stage);
         stage.setTitle("Hệ thống Đấu giá");
-        stage.setScene(scene);
+        SceneManager.switchTo("Login.fxml");
         stage.show();
     }
 
