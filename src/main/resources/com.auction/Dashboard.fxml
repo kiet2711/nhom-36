@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.auction.controller.DashboardController"
+            style="-fx-padding: 20; -fx-min-width: 700; -fx-min-height: 500;">
+
+      <top>
+            <HBox spacing="16" alignment="CENTER_LEFT" style="-fx-padding: 0 0 16 0;">
+                  <Label fx:id="welcomeLabel"
+                         style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+                  <Region HBox.hgrow="ALWAYS"/>
+                  <Button text="Đăng sản phẩm đấu giá"
+                          fx:id="createAuctionBtn"
+                          onAction="#handleCreateAuction"/>
+                  <Button text="Làm mới" onAction="#handleRefresh"/>
+                  <Button text="Đăng xuất" onAction="#handleLogout"/>
+            </HBox>
+      </top>
+
+      <center>
+            <TableView fx:id="auctionTable" style="-fx-min-height: 400;">
+                  <columns>
+                        <TableColumn fx:id="colName"   text="Sản phẩm"     prefWidth="180"/>
+                        <TableColumn fx:id="colType"   text="Loại"         prefWidth="100"/>
+                        <TableColumn fx:id="colPrice"  text="Giá hiện tại" prefWidth="120"/>
+                        <TableColumn fx:id="colStatus" text="Trạng thái"   prefWidth="100"/>
+                        <TableColumn fx:id="colEnd"    text="Kết thúc"     prefWidth="150"/>
+                  </columns>
+            </TableView>
+      </center>
+
+      <bottom>
+            <HBox style="-fx-padding: 12 0 0 0;">
+                  <Button text="Tham gia đấu giá" onAction="#handleJoinAuction"
+                          style="-fx-font-size: 14;"/>
+            </HBox>
+      </bottom>
+</BorderPane>
