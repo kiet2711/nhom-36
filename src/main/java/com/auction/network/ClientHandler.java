@@ -2,7 +2,7 @@ package com.auction.network;
 
 import com.auction.factory.ItemFactory;
 import com.auction.model.*;
-import com.auction.network.observer.AuctionObserver;
+import com.auction.observer.AuctionObserver;
 import com.auction.service.AuctionService;
 import com.auction.db.UserDAO;
 import com.google.gson.*;
