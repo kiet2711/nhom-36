@@ -84,4 +84,7 @@ public class Auction extends Entity {
     public boolean isActive() {
         return status == Status.OPEN || status == Status.RUNNING;
     }
+    public void forceStatus(Status s)         { this.status = s; }
+    public void forceCurrentPrice(double p)   { this.currentPrice = p; }
+    public void forceLeadingBidder(String id) { this.leadingBidderId = id; }
 }
