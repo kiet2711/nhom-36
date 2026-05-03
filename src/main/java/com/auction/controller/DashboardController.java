@@ -7,10 +7,9 @@ import com.google.gson.*;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.*;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-
-import java.util.concurrent.Executors;
 
 public class DashboardController {
 
@@ -51,29 +50,38 @@ public class DashboardController {
 
         auctionTable.setItems(auctionList);
 
-        // Lắng nghe PUSH từ server trong background thread
         startPushListener();
         handleRefresh();
     }
 
     @FXML
     public void handleRefresh() {
-        Executors.newSingleThreadExecutor().execute(() -> {
-            try {
+        // FIX: dùng Task thay vì tạo executor mới mỗi lần (tránh thread leak)
+        Task<JsonArray> task = new Task<>() {
+            @Override
+            protected JsonArray call() throws Exception {
+                // FIX: đảm bảo connect trước khi gửi request
+                if (!client.isConnected()) client.connect();
+
                 Request req = new Request(CommandType.GET_AUCTIONS, null);
                 Response res = client.send(req);
                 if (res.isOk()) {
-                    JsonArray arr = JsonParser.parseString(res.getData()).getAsJsonArray();
-                    Platform.runLater(() -> {
-                        auctionList.clear();
-                        arr.forEach(e -> auctionList.add(e.getAsJsonObject()));
-                    });
+                    return JsonParser.parseString(res.getData()).getAsJsonArray();
                 }
-            } catch (Exception e) {
-                Platform.runLater(() ->
-                        showAlert("Lỗi", "Không thể tải danh sách: " + e.getMessage()));
+                return new JsonArray();
             }
+        };
+
+        task.setOnSucceeded(e -> {
+            JsonArray arr = task.getValue();
+            auctionList.clear();
+            arr.forEach(el -> auctionList.add(el.getAsJsonObject()));
         });
+
+        task.setOnFailed(e ->
+                showAlert("Lỗi", "Không thể tải danh sách: " + task.getException().getMessage()));
+
+        new Thread(task).start();
     }
 
     @FXML
@@ -115,7 +123,7 @@ public class DashboardController {
 
     /** Thread riêng lắng nghe PUSH realtime từ server */
     private void startPushListener() {
-        // Sẽ implement đầy đủ ở Tuần 4
+        // TODO: implement push listener ở Tuần 4
         // Tuần 3 dùng refresh thủ công là đủ
     }
 
