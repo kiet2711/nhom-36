@@ -2,6 +2,7 @@ package com.auction.network;
 
 public enum CommandType {
     LOGIN, REGISTER,
+    CANCEL_AUCTION,
     GET_AUCTIONS, GET_AUCTION_DETAIL,
     CREATE_AUCTION, PLACE_BID,
     CLOSE_AUCTION,

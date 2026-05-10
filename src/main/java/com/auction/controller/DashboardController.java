@@ -1,21 +1,20 @@
 package com.auction.controller;
 
 import com.auction.network.*;
-import com.auction.util.AlertUtil;
-import com.auction.util.SceneManager;
-import com.auction.util.SessionManager;
+import com.auction.util.*;
 import com.google.gson.*;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.*;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+
+import java.util.concurrent.Executors;
 
 public class DashboardController {
 
     @FXML private Label welcomeLabel;
-    @FXML private TableView<JsonObject> auctionTable;
+    @FXML private TableView<JsonObject>           auctionTable;
     @FXML private TableColumn<JsonObject, String> colName;
     @FXML private TableColumn<JsonObject, String> colType;
     @FXML private TableColumn<JsonObject, String> colPrice;
@@ -26,28 +25,22 @@ public class DashboardController {
 
     private final AuctionClient client = AuctionClient.getInstance();
     private final ObservableList<JsonObject> auctionList = FXCollections.observableArrayList();
-    private final Gson gson = new Gson();
 
     @FXML
     public void initialize() {
         welcomeLabel.setText("Xin chào, " + SessionManager.getCurrentUsername()
                 + " (" + SessionManager.getCurrentRole() + ")");
+
         String role = SessionManager.getCurrentRole();
         createAuctionBtn.setVisible("SELLER".equals(role));
-        // adminBtn chỉ hiện với Admin — thêm fx:id="adminBtn" vào Dashboard.fxml
         if (adminBtn != null) adminBtn.setVisible("ADMIN".equals(role));
 
-
-        // Ẩn nút tạo đấu giá nếu không phải Seller
-        createAuctionBtn.setVisible("SELLER".equals(SessionManager.getCurrentRole()));
-
-        // Bind columns
         colName.setCellValueFactory(d ->
                 new SimpleStringProperty(d.getValue().get("itemName").getAsString()));
         colType.setCellValueFactory(d ->
                 new SimpleStringProperty(d.getValue().get("itemType").getAsString()));
         colPrice.setCellValueFactory(d ->
-                new SimpleStringProperty(String.format("%,.0f đ",
+                new SimpleStringProperty(String.format("%,.0f d",
                         d.getValue().get("currentPrice").getAsDouble())));
         colStatus.setCellValueFactory(d ->
                 new SimpleStringProperty(d.getValue().get("status").getAsString()));
@@ -56,69 +49,54 @@ public class DashboardController {
                         d.getValue().get("endTime").getAsString().replace("T", " ")));
 
         auctionTable.setItems(auctionList);
-
-        startPushListener();
         handleRefresh();
     }
 
     @FXML
     public void handleRefresh() {
-        // FIX: dùng Task thay vì tạo executor mới mỗi lần (tránh thread leak)
-        Task<JsonArray> task = new Task<>() {
-            @Override
-            protected JsonArray call() throws Exception {
-                // FIX: đảm bảo connect trước khi gửi request
-                if (!client.isConnected()) client.connect();
-
-                Request req = new Request(CommandType.GET_AUCTIONS, null);
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                Request  req = new Request(CommandType.GET_AUCTIONS, null);
                 Response res = client.send(req);
                 if (res.isOk()) {
-                    return JsonParser.parseString(res.getData()).getAsJsonArray();
+                    JsonArray arr = JsonParser.parseString(res.getData()).getAsJsonArray();
+                    Platform.runLater(() -> {
+                        auctionList.clear();
+                        arr.forEach(e -> auctionList.add(e.getAsJsonObject()));
+                    });
                 }
-                return new JsonArray();
+            } catch (Exception e) {
+                Platform.runLater(() -> AlertUtil.error("Loi", "Khong the tai danh sach: " + e.getMessage()));
             }
-        };
-
-        task.setOnSucceeded(e -> {
-            JsonArray arr = task.getValue();
-            auctionList.clear();
-            arr.forEach(el -> auctionList.add(el.getAsJsonObject()));
         });
-
-        task.setOnFailed(e ->
-                showAlert("Lỗi", "Không thể tải danh sách: " + task.getException().getMessage()));
-
-        new Thread(task).start();
     }
 
     @FXML
     public void handleJoinAuction() {
         JsonObject selected = auctionTable.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showAlert("Thông báo", "Vui lòng chọn một phiên đấu giá.");
-            return;
-        }
+        if (selected == null) { AlertUtil.warning("Thong bao", "Vui long chon mot phien dau gia."); return; }
         String status = selected.get("status").getAsString();
         if (status.equals("FINISHED") || status.equals("CANCELED")) {
-            showAlert("Thông báo", "Phiên đấu giá này đã kết thúc.");
-            return;
+            AlertUtil.warning("Thong bao", "Phien dau gia nay da ket thuc."); return;
         }
         try {
-            BiddingController ctrl =
-                    SceneManager.switchToAndGetController("Bidding.fxml");
+            BiddingController ctrl = SceneManager.switchToAndGetController("Bidding.fxml");
             ctrl.loadAuction(selected);
         } catch (Exception e) {
-            showAlert("Lỗi", "Không thể mở màn hình đấu giá: " + e.getMessage());
+            AlertUtil.error("Loi", "Khong the mo man hinh: " + e.getMessage());
         }
     }
 
     @FXML
     public void handleCreateAuction() {
-        try {
-            SceneManager.switchTo("CreateAuction.fxml");
-        } catch (Exception e) {
-            showAlert("Lỗi", "Không mở được màn hình tạo đấu giá: " + e.getMessage());
-        }
+        try { SceneManager.switchTo("SellerDashboard.fxml"); }
+        catch (Exception e) { AlertUtil.error("Loi", e.getMessage()); }
+    }
+
+    @FXML
+    public void handleAdmin() {
+        try { SceneManager.switchTo("AdminDashboard.fxml"); }
+        catch (Exception e) { AlertUtil.error("Loi", e.getMessage()); }
     }
 
     @FXML
@@ -126,23 +104,5 @@ public class DashboardController {
         SessionManager.clear();
         try { SceneManager.switchTo("Login.fxml"); }
         catch (Exception e) { e.printStackTrace(); }
-    }
-    @FXML
-    public void handleAdmin() {
-        try { SceneManager.switchTo("AdminDashboard.fxml"); }
-        catch (Exception e) { AlertUtil.error("Lỗi", e.getMessage()); }
-    }
-
-    /** Thread riêng lắng nghe PUSH realtime từ server */
-    private void startPushListener() {
-        // TODO: implement push listener ở Tuần 4
-        // Tuần 3 dùng refresh thủ công là đủ
-    }
-
-    private void showAlert(String title, String msg) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setContentText(msg);
-        alert.showAndWait();
     }
 }

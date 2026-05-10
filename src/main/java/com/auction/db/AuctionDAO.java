@@ -7,7 +7,6 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class AuctionDAO {
 
@@ -18,11 +17,7 @@ public class AuctionDAO {
     }
 
     public String save(Auction auction) throws SQLException {
-        // 1. Lưu item trước
-        String itemSql = """
-            INSERT OR IGNORE INTO items(id, name, description, type, starting_price)
-            VALUES(?,?,?,?,?)
-            """;
+        String itemSql = "INSERT OR IGNORE INTO items(id, name, description, type, starting_price) VALUES(?,?,?,?,?)";
         try (PreparedStatement ps = conn.prepareStatement(itemSql)) {
             ps.setString(1, auction.getItem().getId());
             ps.setString(2, auction.getItem().getName());
@@ -31,13 +26,7 @@ public class AuctionDAO {
             ps.setDouble(5, auction.getItem().getStartingPrice());
             ps.executeUpdate();
         }
-
-        // 2. Lưu auction
-        String sql = """
-            INSERT INTO auctions(id, item_id, seller_id, current_price,
-                                 leading_bidder, status, start_time, end_time)
-            VALUES(?,?,?,?,?,?,?,?)
-            """;
+        String sql = "INSERT INTO auctions(id, item_id, seller_id, current_price, leading_bidder, status, start_time, end_time) VALUES(?,?,?,?,?,?,?,?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, auction.getId());
             ps.setString(2, auction.getItem().getId());
@@ -54,11 +43,7 @@ public class AuctionDAO {
 
     public void updateBid(String auctionId, double newPrice,
                           String leadingBidder, String status) throws SQLException {
-        String sql = """
-            UPDATE auctions
-            SET current_price=?, leading_bidder=?, status=?
-            WHERE id=?
-            """;
+        String sql = "UPDATE auctions SET current_price=?, leading_bidder=?, status=? WHERE id=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDouble(1, newPrice);
             ps.setString(2, leadingBidder);
@@ -78,14 +63,10 @@ public class AuctionDAO {
     }
 
     public List<Auction> findAll() throws SQLException {
-        String sql = """
-            SELECT a.*, i.name, i.description, i.type, i.starting_price
-            FROM auctions a JOIN items i ON a.item_id = i.id
-            ORDER BY a.end_time ASC
-            """;
+        String sql = "SELECT a.*, i.name, i.description, i.type, i.starting_price " +
+                "FROM auctions a JOIN items i ON a.item_id = i.id ORDER BY a.end_time ASC";
         List<Auction> result = new ArrayList<>();
-        try (Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
+        try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) result.add(mapAuction(rs));
         }
         return result;
@@ -98,25 +79,18 @@ public class AuctionDAO {
                 rs.getString("description"),
                 rs.getDouble("starting_price")
         );
-        // Đặt lại id đúng từ DB
         item.setId(rs.getString("item_id"));
 
         Auction a = new Auction(
-                rs.getString("id"),
-                item,
-                rs.getString("seller_id"),
+                rs.getString("id"), item, rs.getString("seller_id"),
                 LocalDateTime.parse(rs.getString("start_time")),
                 LocalDateTime.parse(rs.getString("end_time"))
         );
-        // Phản ánh trạng thái thật từ DB
         String status = rs.getString("status");
-        if (!status.equals("OPEN")) {
-            // Dùng reflection-free approach: close() sẽ tự set FINISHED/CANCELED
-            // nên ta map trực tiếp qua force-set bằng cách gọi internal setter
-            a.forceStatus(Auction.Status.valueOf(status));
-        }
+        if (!status.equals("OPEN")) a.forceStatus(Auction.Status.valueOf(status));
         a.forceCurrentPrice(rs.getDouble("current_price"));
-        a.forceLeadingBidder(rs.getString("leading_bidder"));
+        String leader = rs.getString("leading_bidder");
+        if (leader != null) a.forceLeadingBidder(leader);
         return a;
     }
 }

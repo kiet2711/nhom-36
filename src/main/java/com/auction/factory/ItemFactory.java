@@ -4,10 +4,9 @@ import com.auction.model.*;
 
 import java.util.UUID;
 
-/** Factory Method — tạo Item đúng loại theo type string */
 public class ItemFactory {
 
-    private ItemFactory() {}   // utility class, không khởi tạo
+    private ItemFactory() {}
 
     public static Item create(String type, String name,
                               String description, double startingPrice) {

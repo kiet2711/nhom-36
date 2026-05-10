@@ -1,7 +1,7 @@
 package com.auction.controller;
 
 import com.auction.network.*;
-import com.auction.util.SceneManager;
+import com.auction.util.*;
 import com.google.gson.JsonObject;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -11,12 +11,12 @@ import java.util.concurrent.Executors;
 
 public class CreateAuctionController {
 
-    @FXML private TextField nameField;
-    @FXML private TextField descField;
-    @FXML private TextField priceField;
+    @FXML private TextField        nameField;
+    @FXML private TextField        descField;
+    @FXML private TextField        priceField;
     @FXML private ComboBox<String> typeCombo;
-    @FXML private TextField endTimeField;
-    @FXML private Label resultLabel;
+    @FXML private TextField        endTimeField;
+    @FXML private Label            resultLabel;
 
     private final AuctionClient client = AuctionClient.getInstance();
 
@@ -28,16 +28,15 @@ public class CreateAuctionController {
 
     @FXML
     public void handleCreate() {
-        String name    = nameField.getText().trim();
-        String desc    = descField.getText().trim();
-        String priceStr= priceField.getText().trim();
-        String type    = typeCombo.getValue();
-        String endTime = endTimeField.getText().trim();
+        String name     = nameField.getText().trim();
+        String desc     = descField.getText().trim();
+        String priceStr = priceField.getText().trim();
+        String type     = typeCombo.getValue();
+        String endTime  = endTimeField.getText().trim();
 
         if (name.isEmpty() || priceStr.isEmpty() || endTime.isEmpty()) {
             resultLabel.setStyle("-fx-text-fill: red;");
-            resultLabel.setText("Vui lòng điền đầy đủ thông tin.");
-            return;
+            resultLabel.setText("Vui long dien day du thong tin."); return;
         }
 
         Executors.newSingleThreadExecutor().execute(() -> {
@@ -48,14 +47,12 @@ public class CreateAuctionController {
                 payload.addProperty("startingPrice", Double.parseDouble(priceStr));
                 payload.addProperty("type", type);
                 payload.addProperty("endTime", endTime);
-
-                Request req = new Request(CommandType.CREATE_AUCTION, payload.toString());
+                Request  req = new Request(CommandType.CREATE_AUCTION, payload.toString());
                 Response res = client.send(req);
-
                 Platform.runLater(() -> {
                     if (res.isOk()) {
                         resultLabel.setStyle("-fx-text-fill: green;");
-                        resultLabel.setText("Tạo thành công!");
+                        resultLabel.setText("Tao thanh cong!");
                     } else {
                         resultLabel.setStyle("-fx-text-fill: red;");
                         resultLabel.setText(res.getData());
@@ -64,7 +61,7 @@ public class CreateAuctionController {
             } catch (Exception e) {
                 Platform.runLater(() -> {
                     resultLabel.setStyle("-fx-text-fill: red;");
-                    resultLabel.setText("Lỗi: " + e.getMessage());
+                    resultLabel.setText("Loi: " + e.getMessage());
                 });
             }
         });
@@ -72,7 +69,7 @@ public class CreateAuctionController {
 
     @FXML
     public void handleBack() {
-        try { SceneManager.switchTo("Dashboard.fxml"); }
+        try { SceneManager.switchTo("SellerDashboard.fxml"); }
         catch (Exception e) { e.printStackTrace(); }
     }
 }

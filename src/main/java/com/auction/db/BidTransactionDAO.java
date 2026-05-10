@@ -13,10 +13,7 @@ public class BidTransactionDAO {
     }
 
     public void save(BidTransaction tx) throws SQLException {
-        String sql = """
-            INSERT INTO bid_transactions(id, auction_id, bidder_id, amount, bid_time)
-            VALUES(?,?,?,?,?)
-            """;
+        String sql = "INSERT INTO bid_transactions(id, auction_id, bidder_id, amount, bid_time) VALUES(?,?,?,?,?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, tx.getId());
             ps.setString(2, tx.getAuctionId());
