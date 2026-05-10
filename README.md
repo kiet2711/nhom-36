@@ -1,1 +1,7 @@
-# nhom-36
+- Chưa để ý design pattern
+- Hỏi code phần Observer chưa trả lời được
+- Chưa rõ phần đa hình
+- Đã có database (SQLite) + dữ liệu người dung để đăng nhập
+- Có giao diện sau khi đăng nhập, ngoài ra chưa có gì them
+- Tích hợp kiến trúc và chất lượng mã: chưa để ý
+- 6.5 - 8
