@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.chart.*?>
 
 <VBox spacing="14" alignment="TOP_CENTER"
       xmlns:fx="http://javafx.com/fxml"
@@ -39,5 +40,45 @@
     </HBox>
 
     <Label fx:id="resultLabel"/>
+
+    <!-- ★ Bid History Chart -->
+    <LineChart fx:id="bidHistoryChart" prefHeight="250"
+               animated="false" createSymbols="true"
+               legendVisible="false"
+               style="-fx-font-size: 11;">
+        <xAxis>
+            <CategoryAxis label="Thời gian" fx:id="chartXAxis"/>
+        </xAxis>
+        <yAxis>
+            <NumberAxis label="Giá (đ)" fx:id="chartYAxis" forceZeroInRange="false"/>
+        </yAxis>
+    </LineChart>
+
+    <Separator/>
+
+    <!-- ★ Auto-Bid Section -->
+    <TitledPane text="⚡ Đặt giá tự động (Auto-Bid)" expanded="false"
+                style="-fx-font-weight: bold;">
+        <VBox spacing="10" style="-fx-padding: 10;">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Giá tối đa:"/>
+                <TextField fx:id="autoBidMaxField" promptText="VD: 5000000"/>
+            </HBox>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Bước nhảy:"/>
+                <TextField fx:id="autoBidIncrementField" promptText="VD: 100000"/>
+            </HBox>
+            <HBox spacing="10" alignment="CENTER">
+                <Button fx:id="registerAutoBidBtn" text="Đăng ký Auto-Bid"
+                        onAction="#handleRegisterAutoBid"
+                        style="-fx-font-weight: bold;"/>
+                <Button fx:id="cancelAutoBidBtn" text="Hủy Auto-Bid"
+                        onAction="#handleCancelAutoBid"/>
+            </HBox>
+            <Label fx:id="autoBidStatusLabel"
+                   style="-fx-font-style: italic;"/>
+        </VBox>
+    </TitledPane>
+
     <Button text="← Quay lại" onAction="#handleBack"/>
 </VBox>

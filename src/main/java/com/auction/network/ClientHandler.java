@@ -16,7 +16,8 @@ public class ClientHandler implements Runnable, AuctionObserver {
 
     private final Socket socket;
     private final Gson gson = new Gson();
-    protected PrintWriter out;
+    /* CHANGED: protected → private — chỉ truy cập nội bộ class */
+    private PrintWriter out;
 
     private final UserDAO userDAO           = new UserDAO();
     private final AuctionService auctionSvc = AuctionService.getInstance();
@@ -50,8 +51,10 @@ public class ClientHandler implements Runnable, AuctionObserver {
             case LOGIN          -> handleLogin(req);
             case REGISTER       -> handleRegister(req);
             case GET_AUCTIONS   -> handleGetAuctions();
-            case CREATE_AUCTION -> handleCreateAuction(req);
-            case PLACE_BID      -> handlePlaceBid(req);
+            case CREATE_AUCTION    -> handleCreateAuction(req);
+            case PLACE_BID         -> handlePlaceBid(req);
+            case REGISTER_AUTO_BID -> handleRegisterAutoBid(req);
+            case CANCEL_AUTO_BID   -> handleCancelAutoBid(req);
             default -> Response.error("Lệnh chưa hỗ trợ: " + req.getCommand());
         };
     }
@@ -95,9 +98,9 @@ public class ClientHandler implements Runnable, AuctionObserver {
     }
 
     private Response handlePlaceBid(Request req) {
-        if (loggedInUser == null) {
-            return Response.error("Bạn chưa đăng nhập.");
-        }
+        /* CHANGED: extract duplicated login check → requireLogin() */
+        Response loginCheck = requireLogin();
+        if (loginCheck != null) return loginCheck;
         try {
             JsonObject data  = JsonParser.parseString(req.getData()).getAsJsonObject();
             String auctionId = data.get("auctionId").getAsString();
@@ -111,6 +114,46 @@ public class ClientHandler implements Runnable, AuctionObserver {
             result.addProperty("amount",  tx.getAmount());
             result.addProperty("bidTime", tx.getBidTime().toString());
             return Response.ok(result.toString());
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+    // --- Auto-Bid handlers ---
+
+    private Response handleRegisterAutoBid(Request req) {
+        Response loginCheck = requireLogin();
+        if (loginCheck != null) return loginCheck;
+        try {
+            JsonObject data  = JsonParser.parseString(req.getData()).getAsJsonObject();
+            String auctionId = data.get("auctionId").getAsString();
+            double maxBid    = data.get("maxBid").getAsDouble();
+            double increment = data.get("increment").getAsDouble();
+
+            auctionSvc.registerAutoBid(auctionId, loggedInUser.getId(),
+                    maxBid, increment);
+
+            JsonObject result = new JsonObject();
+            result.addProperty("message", "Đã đăng ký auto-bid thành công.");
+            result.addProperty("auctionId", auctionId);
+            result.addProperty("maxBid", maxBid);
+            result.addProperty("increment", increment);
+            return Response.ok(result.toString());
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
+    }
+
+    private Response handleCancelAutoBid(Request req) {
+        Response loginCheck = requireLogin();
+        if (loginCheck != null) return loginCheck;
+        try {
+            JsonObject data  = JsonParser.parseString(req.getData()).getAsJsonObject();
+            String auctionId = data.get("auctionId").getAsString();
+
+            auctionSvc.cancelAutoBid(auctionId, loggedInUser.getId());
+
+            return Response.ok("Đã hủy auto-bid thành công.");
         } catch (Exception e) {
             return Response.error(e.getMessage());
         }
@@ -161,20 +204,26 @@ public class ClientHandler implements Runnable, AuctionObserver {
         }
     }
 
-    public void send(Response res) {
+    /* CHANGED: public → package-private — chỉ AuctionServer cùng package gọi */
+    void send(Response res) {
         if (out != null) out.println(gson.toJson(res));
     }
 
-    // --- Helper ---
+    /* CHANGED: extract duplicated login check dùng ở 4 handler */
+    private Response requireLogin() {
+        return (loggedInUser == null) ? Response.error("Bạn chưa đăng nhập.") : null;
+    }
+
+    /* CHANGED: đổi tên biến 'o' → 'json' cho rõ nghĩa */
     private JsonObject auctionToJson(Auction a) {
-        JsonObject o = new JsonObject();
-        o.addProperty("id",             a.getId());
-        o.addProperty("itemName",       a.getItem().getName());
-        o.addProperty("itemType",       a.getItem().getType());
-        o.addProperty("currentPrice",   a.getCurrentPrice());
-        o.addProperty("status",         a.getStatus().name());
-        o.addProperty("endTime",        a.getEndTime().toString());
-        o.addProperty("leadingBidder",  a.getLeadingBidderId());
-        return o;
+        JsonObject json = new JsonObject();
+        json.addProperty("id",             a.getId());
+        json.addProperty("itemName",       a.getItem().getName());
+        json.addProperty("itemType",       a.getItem().getType());
+        json.addProperty("currentPrice",   a.getCurrentPrice());
+        json.addProperty("status",         a.getStatus().name());
+        json.addProperty("endTime",        a.getEndTime().toString());
+        json.addProperty("leadingBidder",  a.getLeadingBidderId());
+        return json;
     }
 }

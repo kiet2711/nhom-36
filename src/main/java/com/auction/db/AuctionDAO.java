@@ -62,6 +62,16 @@ public class AuctionDAO {
         }
     }
 
+    /** ★ Anti-sniping: Cập nhật endTime mới xuống DB */
+    public void updateEndTime(String auctionId, LocalDateTime newEndTime) throws SQLException {
+        String sql = "UPDATE auctions SET end_time=? WHERE id=?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newEndTime.toString());
+            ps.setString(2, auctionId);
+            ps.executeUpdate();
+        }
+    }
+
     public List<Auction> findAll() throws SQLException {
         String sql = "SELECT a.*, i.name, i.description, i.type, i.starting_price " +
                 "FROM auctions a JOIN items i ON a.item_id = i.id ORDER BY a.end_time ASC";
