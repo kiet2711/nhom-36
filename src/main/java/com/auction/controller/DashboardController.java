@@ -1,6 +1,7 @@
 package com.auction.controller;
 
 import com.auction.network.*;
+import com.auction.util.AlertUtil;
 import com.auction.util.SceneManager;
 import com.auction.util.SessionManager;
 import com.google.gson.*;
@@ -21,6 +22,7 @@ public class DashboardController {
     @FXML private TableColumn<JsonObject, String> colStatus;
     @FXML private TableColumn<JsonObject, String> colEnd;
     @FXML private Button createAuctionBtn;
+    @FXML private Button adminBtn;
 
     private final AuctionClient client = AuctionClient.getInstance();
     private final ObservableList<JsonObject> auctionList = FXCollections.observableArrayList();
@@ -30,6 +32,11 @@ public class DashboardController {
     public void initialize() {
         welcomeLabel.setText("Xin chào, " + SessionManager.getCurrentUsername()
                 + " (" + SessionManager.getCurrentRole() + ")");
+        String role = SessionManager.getCurrentRole();
+        createAuctionBtn.setVisible("SELLER".equals(role));
+        // adminBtn chỉ hiện với Admin — thêm fx:id="adminBtn" vào Dashboard.fxml
+        if (adminBtn != null) adminBtn.setVisible("ADMIN".equals(role));
+
 
         // Ẩn nút tạo đấu giá nếu không phải Seller
         createAuctionBtn.setVisible("SELLER".equals(SessionManager.getCurrentRole()));
@@ -119,6 +126,11 @@ public class DashboardController {
         SessionManager.clear();
         try { SceneManager.switchTo("Login.fxml"); }
         catch (Exception e) { e.printStackTrace(); }
+    }
+    @FXML
+    public void handleAdmin() {
+        try { SceneManager.switchTo("AdminDashboard.fxml"); }
+        catch (Exception e) { AlertUtil.error("Lỗi", e.getMessage()); }
     }
 
     /** Thread riêng lắng nghe PUSH realtime từ server */
