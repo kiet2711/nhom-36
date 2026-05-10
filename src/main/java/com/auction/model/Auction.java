@@ -48,16 +48,16 @@ public class Auction extends Entity {
         return tx;
     }
 
+    // Sửa phương thức validateBid trong Auction.java
     private void validateBid(String bidderId, double amount) {
         if (status == Status.FINISHED || status == Status.CANCELED) {
-            throw new IllegalStateException("Phiên đấu giá đã kết thúc.");
+            throw new AuctionClosedException(this.id);
         }
         if (amount <= currentPrice) {
-            throw new IllegalArgumentException(
-                    "Giá đặt phải cao hơn giá hiện tại (" + currentPrice + ").");
+            throw new InvalidBidException(amount, currentPrice);
         }
         if (bidderId.equals(sellerId)) {
-            throw new IllegalArgumentException("Người bán không thể tự đấu giá.");
+            throw new UnauthorizedException("Người bán không thể tự đấu giá.");
         }
     }
 
