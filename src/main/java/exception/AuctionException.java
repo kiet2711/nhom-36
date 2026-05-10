@@ -1,4 +1,4 @@
-import com.auction.exception.*;
+package com.auction.exception;
 
 /** Base exception cho toàn bộ hệ thống đấu giá */
 public class AuctionException extends RuntimeException {
