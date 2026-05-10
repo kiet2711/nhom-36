@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.auction.controller.AdminDashboardController"
+            style="-fx-padding: 20; -fx-min-width: 760; -fx-min-height: 550;">
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 0 0 16 0;">
+            <Label text="ADMIN - QUAN LY HE THONG" style="-fx-font-size: 15; -fx-font-weight: bold;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Lam moi"      onAction="#handleRefresh"/>
+            <Button text="&lt;- Quay lai" onAction="#handleBack"/>
+        </HBox>
+    </top>
+    <center>
+        <TabPane>
+            <Tab text="Tat ca phien dau gia" closable="false">
+                <TableView fx:id="auctionTable">
+                    <columns>
+                        <TableColumn fx:id="colAuctionId"     text="ID"          prefWidth="90"/>
+                        <TableColumn fx:id="colAuctionName"   text="San pham"    prefWidth="150"/>
+                        <TableColumn fx:id="colAuctionPrice"  text="Gia"         prefWidth="110"/>
+                        <TableColumn fx:id="colAuctionStatus" text="Trang thai"  prefWidth="100"/>
+                        <TableColumn fx:id="colAuctionSeller" text="Seller ID"   prefWidth="120"/>
+                        <TableColumn fx:id="colAuctionEnd"    text="Ket thuc"    prefWidth="130"/>
+                    </columns>
+                </TableView>
+            </Tab>
+            <Tab text="Thong ke" closable="false">
+                <VBox spacing="12" style="-fx-padding: 24;">
+                    <Label fx:id="statTotal"    style="-fx-font-size: 14;"/>
+                    <Label fx:id="statRunning"  style="-fx-font-size: 14;"/>
+                    <Label fx:id="statFinished" style="-fx-font-size: 14;"/>
+                    <Label fx:id="statCanceled" style="-fx-font-size: 14;"/>
+                </VBox>
+            </Tab>
+        </TabPane>
+    </center>
+    <bottom>
+        <HBox style="-fx-padding: 12 0 0 0;">
+            <Button text="Dong phien da chon" onAction="#handleForceClose" style="-fx-text-fill: red;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

@@ -16,6 +16,8 @@
                           onAction="#handleCreateAuction"/>
                   <Button text="Làm mới" onAction="#handleRefresh"/>
                   <Button text="Đăng xuất" onAction="#handleLogout"/>
+                  <Button fx:id="adminBtn" text="Quản trị hệ thống"
+                          onAction="#handleAdmin" visible="false"/>
             </HBox>
       </top>
 
