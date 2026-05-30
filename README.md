@@ -36,9 +36,9 @@ Hệ thống đấu giá trực tuyến Client-Server sử dụng Java, JavaFX, 
 - 🔔 Nhận thông báo realtime khi có người đặt giá
 
 ### Quản trị viên (Admin)
-- 📊 Xem thống kê toàn bộ hệ thống
-- 🔒 Đóng phiên đấu giá bất kỳ
-- 📋 Quản lý tất cả phiên đấu giá
+- 👥 **Quản lý User**: Xem danh sách, Khóa/Mở khóa tài khoản, Xóa user vi phạm (Cascade Delete).
+- 📋 **Quản lý Phiên đấu giá**: Xem tất cả phiên, đóng sớm (Force Finish) để chọn ngay người thắng, hoặc Hủy phiên (Cancel) nếu có gian lận.
+- 📈 **Giám sát hệ thống**: Xem toàn bộ log giao dịch (Bid History), thống kê số lượng phiên và user theo trạng thái.
 
 ### Hệ thống
 - 🔐 Đăng ký / Đăng nhập (3 role: Bidder, Seller, Admin)
@@ -278,14 +278,11 @@ mvn test
 
 ## 👥 Thành Viên Nhóm 36
 
-| STT | Họ và Tên | MSSV | Vai trò |
-|-----|-----------|------|---------|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
+| STT | Họ và Tên | Phụ trách | Keyword khi thầy hỏi |
+|-----|-----------|-----------|-----------------------|
+| 1 | Lữ Thanh Phúc | Server + DB | Multi-thread, DAO, SQLite, schema |
+| 2 | Nguyễn Gia Minh | Client UI | MVC, JavaFX, FXML, Platform.runLater |
+| 3 | Đỗ Tuấn Kiệt | Model + Logic | OOP, Factory Method, Singleton, Scheduler |
+| 4 | Vũ Minh Quang | Network + Test | Socket, BlockingQueue, ReentrantLock, Observer, JUnit |
 
----
 
-## 📄 License
-
-Dự án này được phát triển phục vụ mục đích học tập tại trường đại học.
