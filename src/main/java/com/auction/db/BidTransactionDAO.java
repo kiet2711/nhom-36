@@ -46,6 +46,34 @@ public class BidTransactionDAO {
         return result;
     }
 
+    // ================= ADMIN FUNCTIONS =================
+
+    public com.google.gson.JsonArray getAllTransactions() {
+        com.google.gson.JsonArray arr = new com.google.gson.JsonArray();
+        String sql = "SELECT bt.id, bt.auction_id, a.item_id, i.name as item_name, bt.bidder_id, u.username, bt.amount, bt.bid_time " +
+                     "FROM bid_transactions bt " +
+                     "JOIN auctions a ON bt.auction_id = a.id " +
+                     "JOIN items i ON a.item_id = i.id " +
+                     "JOIN users u ON bt.bidder_id = u.id " +
+                     "ORDER BY bt.bid_time DESC";
+        try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                com.google.gson.JsonObject obj = new com.google.gson.JsonObject();
+                obj.addProperty("id", rs.getString("id"));
+                obj.addProperty("auctionId", rs.getString("auction_id"));
+                obj.addProperty("itemName", rs.getString("item_name"));
+                obj.addProperty("bidderId", rs.getString("bidder_id"));
+                obj.addProperty("username", rs.getString("username"));
+                obj.addProperty("amount", rs.getDouble("amount"));
+                obj.addProperty("bidTime", rs.getString("bid_time"));
+                arr.add(obj);
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi getAllTransactions: " + e.getMessage());
+        }
+        return arr;
+    }
+
     /** DTO đơn giản cho kết quả query bid history */
     public static class BidRecord {
         public final String bidderId;

@@ -60,6 +60,11 @@ public class ClientHandler implements Runnable, AuctionObserver {
             case REGISTER_AUTO_BID -> handleRegisterAutoBid(req);
             case CANCEL_AUTO_BID   -> handleCancelAutoBid(req);
             case CANCEL_AUCTION    -> handleCancelAuction(req);
+            case GET_ALL_USERS     -> handleGetAllUsers();
+            case UPDATE_USER_STATUS -> handleUpdateUserStatus(req);
+            case DELETE_USER       -> handleDeleteUser(req);
+            case ADMIN_FORCE_FINISH_AUCTION -> handleAdminForceFinishAuction(req);
+            case GET_ALL_BIDS      -> handleGetAllBids();
             default -> Response.error("Lệnh chưa hỗ trợ: " + req.getCommand());
         };
     }
@@ -159,18 +164,91 @@ public class ClientHandler implements Runnable, AuctionObserver {
     }
 
     private Response handleCancelAuction(Request req) {
-        if (loggedInUser == null || !loggedInUser.getRole().equals("SELLER")) {
-            return Response.error("Chỉ Seller mới có thể hủy phiên đấu giá.");
+        if (loggedInUser == null) return Response.error("Bạn chưa đăng nhập.");
+        if (!loggedInUser.getRole().equals("SELLER") && !loggedInUser.getRole().equals("ADMIN")) {
+            return Response.error("Bạn không có quyền hủy phiên đấu giá.");
         }
         try {
             JsonObject data  = JsonParser.parseString(req.getData()).getAsJsonObject();
             String auctionId = data.get("auctionId").getAsString();
-            auctionSvc.cancelAuction(auctionId, loggedInUser.getId());
-            return Response.ok("Đã hủy phiên thành công.");
+            
+            if (loggedInUser.getRole().equals("ADMIN")) {
+                auctionSvc.adminCancelAuction(auctionId);
+            } else {
+                auctionSvc.cancelAuction(auctionId, loggedInUser.getId());
+            }
+            return Response.ok("Đã hủy phiên.");
         } catch (Exception e) {
-            return Response.error("Lỗi hủy phiên: " + e.getMessage());
+            return Response.error("Lỗi: " + e.getMessage());
         }
     }
+
+    // ======================== ADMIN HANDLERS ========================
+
+    private Response requireAdmin() {
+        if (loggedInUser == null) return Response.error("Bạn chưa đăng nhập.");
+        if (!"ADMIN".equals(loggedInUser.getRole())) return Response.error("Không có quyền Admin.");
+        return null;
+    }
+
+    private Response handleGetAllUsers() {
+        Response auth = requireAdmin(); if (auth != null) return auth;
+        UserDAO userDao = new UserDAO();
+        return Response.ok(userDao.getAllUsers().toString());
+    }
+
+    private Response handleUpdateUserStatus(Request req) {
+        Response auth = requireAdmin(); if (auth != null) return auth;
+        try {
+            JsonObject data = JsonParser.parseString(req.getData()).getAsJsonObject();
+            String userId = data.get("userId").getAsString();
+            String status = data.get("status").getAsString();
+            UserDAO userDao = new UserDAO();
+            if (userDao.updateStatus(userId, status)) {
+                return Response.ok("Đã cập nhật trạng thái user.");
+            } else {
+                return Response.error("Không tìm thấy user.");
+            }
+        } catch (Exception e) {
+            return Response.error("Lỗi: " + e.getMessage());
+        }
+    }
+
+    private Response handleDeleteUser(Request req) {
+        Response auth = requireAdmin(); if (auth != null) return auth;
+        try {
+            JsonObject data = JsonParser.parseString(req.getData()).getAsJsonObject();
+            String userId = data.get("userId").getAsString();
+            UserDAO userDao = new UserDAO();
+            if (userDao.deleteUser(userId)) {
+                return Response.ok("Đã xóa user thành công.");
+            } else {
+                return Response.error("Lỗi khi xóa user.");
+            }
+        } catch (Exception e) {
+            return Response.error("Lỗi: " + e.getMessage());
+        }
+    }
+
+    private Response handleAdminForceFinishAuction(Request req) {
+        Response auth = requireAdmin(); if (auth != null) return auth;
+        try {
+            JsonObject data = JsonParser.parseString(req.getData()).getAsJsonObject();
+            String auctionId = data.get("auctionId").getAsString();
+            auctionSvc.closeAuction(auctionId); // Đóng ngay lập tức
+            return Response.ok("Đã kết thúc phiên đấu giá.");
+        } catch (Exception e) {
+            return Response.error("Lỗi: " + e.getMessage());
+        }
+    }
+
+    private Response handleGetAllBids() {
+        Response auth = requireAdmin(); if (auth != null) return auth;
+        BidTransactionDAO txDao = new BidTransactionDAO();
+        return Response.ok(txDao.getAllTransactions().toString());
+    }
+
+    // ======================== COMMON HELPERS ========================
 
     private Response handlePlaceBid(Request req) {
         /* CHANGED: extract duplicated login check → requireLogin() */

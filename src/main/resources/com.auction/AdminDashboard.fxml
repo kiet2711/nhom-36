@@ -5,7 +5,7 @@
             fx:controller="com.auction.controller.AdminDashboardController"
             stylesheets="@style.css"
             styleClass="root"
-            style="-fx-padding: 30; -fx-min-width: 850; -fx-min-height: 600;">
+            style="-fx-padding: 30; -fx-min-width: 900; -fx-min-height: 650;">
     <top>
         <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 0 0 20 0;">
             <Label text="QUẢN TRỊ HỆ THỐNG" styleClass="header-label" style="-fx-font-size: 24px;"/>
@@ -15,36 +15,86 @@
         </HBox>
     </top>
     <center>
-        <TabPane tabClosingPolicy="UNAVAILABLE" styleClass="card">
-            <Tab text="Tất cả phiên đấu giá">
-                <VBox>
+        <TabPane fx:id="adminTabPane" tabClosingPolicy="UNAVAILABLE" styleClass="card">
+            
+            <!-- TAB: Phiên đấu giá -->
+            <Tab text="Phiên Đấu Giá &amp; Sản Phẩm">
+                <VBox spacing="10" style="-fx-padding: 10;">
                     <TableView fx:id="auctionTable" VBox.vgrow="ALWAYS" styleClass="table-view">
                         <columns>
                             <TableColumn fx:id="colAuctionId"     text="ID"          prefWidth="90"/>
                             <TableColumn fx:id="colAuctionName"   text="Tên Sản Phẩm" prefWidth="170"/>
-                            <TableColumn fx:id="colAuctionPrice"  text="Giá Hiện Tại" prefWidth="130"/>
-                            <TableColumn fx:id="colAuctionStatus" text="Trạng Thái"  prefWidth="110"/>
+                            <TableColumn fx:id="colAuctionPrice"  text="Giá Hiện Tại" prefWidth="120"/>
+                            <TableColumn fx:id="colAuctionStatus" text="Trạng Thái"  prefWidth="100"/>
                             <TableColumn fx:id="colAuctionSeller" text="ID Người Bán" prefWidth="120"/>
                             <TableColumn fx:id="colAuctionEnd"    text="Thời Gian Kết Thúc" prefWidth="150"/>
                         </columns>
                     </TableView>
+                    <HBox spacing="15" alignment="CENTER_RIGHT">
+                        <Button text="ĐÓNG SỚM (KẾT THÚC)" onAction="#handleForceFinish" styleClass="button" prefHeight="35"/>
+                        <Button text="HỦY PHIÊN VI PHẠM" onAction="#handleForceCancel" styleClass="button-danger" prefHeight="35"/>
+                    </HBox>
                 </VBox>
             </Tab>
-            <Tab text="Thống kê">
+
+            <!-- TAB: Người Dùng -->
+            <Tab text="Người Dùng">
+                <VBox spacing="10" style="-fx-padding: 10;">
+                    <TableView fx:id="userTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                        <columns>
+                            <TableColumn fx:id="colUserId"       text="ID"        prefWidth="150"/>
+                            <TableColumn fx:id="colUsername"     text="Tài Khoản" prefWidth="180"/>
+                            <TableColumn fx:id="colUserRole"     text="Vai Trò"   prefWidth="150"/>
+                            <TableColumn fx:id="colUserStatus"   text="Trạng Thái" prefWidth="150"/>
+                        </columns>
+                    </TableView>
+                    <HBox spacing="15" alignment="CENTER_RIGHT">
+                        <Button text="KHÓA / MỞ KHÓA" onAction="#handleToggleUserLock" styleClass="button-secondary" prefHeight="35"/>
+                        <Button text="XÓA USER" onAction="#handleDeleteUser" styleClass="button-danger" prefHeight="35"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+
+            <!-- TAB: Lịch Sử Giao Dịch -->
+            <Tab text="Giám Sát Bids">
+                <VBox spacing="10" style="-fx-padding: 10;">
+                    <TableView fx:id="bidTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                        <columns>
+                            <TableColumn fx:id="colBidTime"      text="Thời Gian"   prefWidth="150"/>
+                            <TableColumn fx:id="colBidAuction"   text="Tên Sản Phẩm" prefWidth="170"/>
+                            <TableColumn fx:id="colBidUsername"  text="Người Đặt (Bidder)" prefWidth="150"/>
+                            <TableColumn fx:id="colBidAmount"    text="Số Tiền"     prefWidth="150"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <!-- TAB: Thống kê -->
+            <Tab text="Thống Kê">
                 <VBox spacing="15" style="-fx-padding: 30;">
-                    <Label text="Báo Cáo Thống Kê" styleClass="title-label" style="-fx-font-size: 20px;"/>
+                    <Label text="Báo Cáo Hoạt Động Hệ Thống" styleClass="title-label" style="-fx-font-size: 20px;"/>
                     <Separator/>
-                    <Label fx:id="statTotal"    styleClass="title-label" style="-fx-font-size: 16px;"/>
-                    <Label fx:id="statRunning"  styleClass="title-label" style="-fx-font-size: 16px; -fx-text-fill: #3b82f6;"/>
-                    <Label fx:id="statFinished" styleClass="title-label" style="-fx-font-size: 16px; -fx-text-fill: #6b7280;"/>
-                    <Label fx:id="statCanceled" styleClass="title-label" style="-fx-font-size: 16px; -fx-text-fill: #ef4444;"/>
+                    <HBox spacing="50">
+                        <!-- Cột Phiên đấu giá -->
+                        <VBox spacing="10">
+                            <Label text="Phiên Đấu Giá" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+                            <Label fx:id="statTotal"    style="-fx-font-size: 14px;"/>
+                            <Label fx:id="statRunning"  style="-fx-font-size: 14px; -fx-text-fill: #3b82f6;"/>
+                            <Label fx:id="statFinished" style="-fx-font-size: 14px; -fx-text-fill: #059669;"/>
+                            <Label fx:id="statCanceled" style="-fx-font-size: 14px; -fx-text-fill: #ef4444;"/>
+                        </VBox>
+                        <!-- Cột Người dùng -->
+                        <VBox spacing="10">
+                            <Label text="Người Dùng &amp; Giao Dịch" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+                            <Label fx:id="statTotalUsers"   style="-fx-font-size: 14px;"/>
+                            <Label fx:id="statActiveUsers"  style="-fx-font-size: 14px; -fx-text-fill: #3b82f6;"/>
+                            <Label fx:id="statLockedUsers"  style="-fx-font-size: 14px; -fx-text-fill: #ef4444;"/>
+                            <Label fx:id="statTotalBids"    style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 0 0 0;"/>
+                        </VBox>
+                    </HBox>
                 </VBox>
             </Tab>
+
         </TabPane>
     </center>
-    <bottom>
-        <HBox style="-fx-padding: 20 0 0 0;">
-            <Button text="ĐÓNG PHIÊN ĐÃ CHỌN" onAction="#handleForceClose" styleClass="button-danger" prefHeight="35"/>
-        </HBox>
-    </bottom>
 </BorderPane>

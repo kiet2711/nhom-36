@@ -181,6 +181,26 @@ public class AuctionService {
         autoBidRegistry.remove(auctionId);
     }
 
+    /**
+     * Hủy phiên đấu giá (chỉ dùng cho Admin).
+     */
+    public void adminCancelAuction(String auctionId) throws Exception {
+        Auction auction = findAuctionOrThrow(auctionId);
+        ReentrantLock lock = getLock(auctionId);
+        lock.lock();
+        try {
+            if (!auction.isActive()) {
+                throw new IllegalStateException("Chỉ có thể hủy phiên đang hoạt động.");
+            }
+            auction.forceStatus(Auction.Status.CANCELED);
+            auctionDAO.updateStatus(auctionId, Auction.Status.CANCELED.name());
+            notifyObservers(auction);
+        } finally {
+            lock.unlock();
+        }
+        autoBidRegistry.remove(auctionId);
+    }
+
     // ======================== AUTO-BID API ========================
 
     /**

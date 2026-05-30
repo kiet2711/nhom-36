@@ -39,6 +39,14 @@ public class DatabaseManager {
                 String s = stmt.trim();
                 if (!s.isEmpty()) connection.createStatement().execute(s);
             }
+            
+            // Đảm bảo cập nhật schema cũ: thêm cột status nếu chưa có
+            try {
+                connection.createStatement().execute("ALTER TABLE users ADD COLUMN status TEXT DEFAULT 'ACTIVE'");
+            } catch (SQLException e) {
+                // Ignore nếu cột đã tồn tại
+            }
+            
         } catch (IOException | SQLException e) {
             throw new RuntimeException("Lỗi khởi tạo schema: " + e.getMessage(), e);
         }
