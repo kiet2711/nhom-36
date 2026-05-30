@@ -5,6 +5,7 @@ import com.auction.model.*;
 import com.auction.network.observer.AuctionObserver;
 import com.auction.service.AuctionService;
 import com.auction.db.UserDAO;
+import com.auction.db.BidTransactionDAO;
 import com.google.gson.*;
 
 import java.io.*;
@@ -53,6 +54,7 @@ public class ClientHandler implements Runnable, AuctionObserver {
             case GET_AUCTIONS   -> handleGetAuctions();
             case GET_MY_BIDS    -> handleGetMyBids();
             case GET_WON_AUCTIONS -> handleGetWonAuctions();
+            case GET_BID_HISTORY   -> handleGetBidHistory(req);
             case CREATE_AUCTION    -> handleCreateAuction(req);
             case PLACE_BID         -> handlePlaceBid(req);
             case REGISTER_AUTO_BID -> handleRegisterAutoBid(req);
@@ -63,6 +65,26 @@ public class ClientHandler implements Runnable, AuctionObserver {
     }
 
     // --- Auction handlers ---
+
+    private Response handleGetBidHistory(Request req) {
+        try {
+            JsonObject data = JsonParser.parseString(req.getData()).getAsJsonObject();
+            String auctionId = data.get("auctionId").getAsString();
+            BidTransactionDAO txDao = new BidTransactionDAO();
+            var history = txDao.findByAuction(auctionId);
+            JsonArray arr = new JsonArray();
+            for (var record : history) {
+                JsonObject obj = new JsonObject();
+                obj.addProperty("bidderId", record.bidderId);
+                obj.addProperty("amount", record.amount);
+                obj.addProperty("bidTime", record.bidTime);
+                arr.add(obj);
+            }
+            return Response.ok(arr.toString());
+        } catch (Exception e) {
+            return Response.error("Lỗi lấy lịch sử bid: " + e.getMessage());
+        }
+    }
 
     private Response handleGetAuctions() {
         try {

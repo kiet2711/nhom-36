@@ -88,3 +88,38 @@
     -fx-background-color: #3498db;
     -fx-text-fill: white;
 }
+
+/* ★ Line Chart Styling */
+.chart-series-line {
+    -fx-stroke: #3b82f6;
+    -fx-stroke-width: 2.5px;
+}
+
+.chart-line-symbol {
+    -fx-background-color: #2563eb, white;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 5px;
+    -fx-padding: 4px;
+}
+
+.chart-plot-background {
+    -fx-background-color: #fafbfc;
+}
+
+.axis-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6b7280;
+}
+
+.axis-tick-mark {
+    -fx-stroke: #d1d5db;
+}
+
+.chart-horizontal-grid-lines {
+    -fx-stroke: #e5e7eb;
+    -fx-stroke-dash-array: 4 4;
+}
+
+.chart-vertical-grid-lines {
+    -fx-stroke: transparent;
+}

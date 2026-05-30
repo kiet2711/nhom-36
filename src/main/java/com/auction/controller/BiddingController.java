@@ -43,16 +43,19 @@ public class BiddingController {
     @FXML private CategoryAxis chartXAxis;
     @FXML private NumberAxis   chartYAxis;
     private XYChart.Series<String, Number> bidSeries;
+    private int chartPointIndex = 0; // Dùng làm label ngắn gọn cho trục X
 
     // Winner notification
     @FXML private VBox  winnerBox;
     @FXML private Label winnerLabel;
 
-    private static final DateTimeFormatter TIME_FMT  = DateTimeFormatter.ofPattern("HH:mm:ss");
-    private static final DateTimeFormatter CLOCK_FMT = DateTimeFormatter.ofPattern("HH:mm:ss  dd/MM/yyyy");
+    // Format: chỉ hiện giờ:phút cho gọn trên trục X
+    private static final DateTimeFormatter CHART_TIME_FMT = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter CLOCK_FMT      = DateTimeFormatter.ofPattern("HH:mm:ss  dd/MM/yyyy");
 
     private JsonObject      auctionData;
     private String          currentAuctionId;
+    private double          lastChartPrice = -1; // Tránh thêm điểm trùng giá
     private final AuctionClient client = AuctionClient.getInstance();
     private final Gson gson = new Gson();
     private Timeline countdownTimeline;
@@ -70,6 +73,24 @@ public class BiddingController {
         bidSeries.setName("Giá đấu giá");
         if (bidHistoryChart != null) {
             bidHistoryChart.getData().add(bidSeries);
+            bidHistoryChart.setAnimated(false);
+            bidHistoryChart.setCreateSymbols(true);
+            bidHistoryChart.setLegendVisible(false);
+            // Ẩn grid ngang cho gọn
+            bidHistoryChart.setHorizontalGridLinesVisible(true);
+            bidHistoryChart.setVerticalGridLinesVisible(false);
+        }
+        if (chartXAxis != null) {
+            chartXAxis.setLabel("Thời gian");
+            chartXAxis.setAnimated(false);
+            chartXAxis.setTickMarkVisible(true);
+            chartXAxis.setGapStartAndEnd(true);
+        }
+        if (chartYAxis != null) {
+            chartYAxis.setLabel("Giá (đ)");
+            chartYAxis.setAnimated(false);
+            chartYAxis.setForceZeroInRange(false);
+            chartYAxis.setAutoRanging(true);
         }
     }
 
@@ -112,8 +133,76 @@ public class BiddingController {
         this.auctionData      = data;
         this.currentAuctionId = data.get("id").getAsString();
         refreshUI(data);
-        addChartDataPoint(data);
         startCountdown();
+
+        // ★ Load lịch sử bid từ server để hiện trên chart
+        loadBidHistory();
+    }
+
+    /**
+     * ★ Gọi server lấy toàn bộ lịch sử bid của phiên → vẽ lên chart
+     */
+    private void loadBidHistory() {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                JsonObject payload = new JsonObject();
+                payload.addProperty("auctionId", currentAuctionId);
+                Request  req = new Request(CommandType.GET_BID_HISTORY, payload.toString());
+                Response res = client.send(req);
+                if (res.isOk()) {
+                    JsonArray history = JsonParser.parseString(res.getData()).getAsJsonArray();
+                    Platform.runLater(() -> {
+                        bidSeries.getData().clear();
+                        chartPointIndex = 0;
+                        lastChartPrice = -1;
+
+                        if (history.isEmpty()) {
+                            // Nếu chưa có bid nào → hiện điểm giá khởi điểm
+                            double startPrice = auctionData.get("currentPrice").getAsDouble();
+                            addChartPoint("Khởi điểm", startPrice);
+                        } else {
+                            // Vẽ tất cả các bid lịch sử
+                            for (JsonElement e : history) {
+                                JsonObject bid = e.getAsJsonObject();
+                                double amount = bid.get("amount").getAsDouble();
+                                String bidTime = bid.get("bidTime").getAsString();
+                                // Chỉ lấy HH:mm từ timestamp
+                                String timeLabel = formatBidTime(bidTime);
+                                addChartPoint(timeLabel, amount);
+                            }
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                System.err.println("Lỗi load bid history: " + e.getMessage());
+            }
+        });
+    }
+
+    /** Format thời gian bid thành dạng "HH:mm" dễ nhìn trên trục X */
+    private String formatBidTime(String isoTime) {
+        try {
+            LocalDateTime dt = LocalDateTime.parse(isoTime);
+            return dt.format(CHART_TIME_FMT);
+        } catch (Exception e) {
+            // Fallback: lấy 5 ký tự cuối (phần giờ:phút)
+            if (isoTime.length() >= 16) return isoTime.substring(11, 16);
+            return isoTime;
+        }
+    }
+
+    /** Thêm 1 điểm vào chart, tự đánh số thứ tự nếu cùng thời gian */
+    private void addChartPoint(String timeLabel, double price) {
+        if (bidHistoryChart == null || bidSeries == null) return;
+        chartPointIndex++;
+        // Nếu có nhiều bid cùng phút, thêm ký tự phân biệt
+        String label = timeLabel;
+        // Giữ tối đa 20 điểm để chart không quá chật
+        if (bidSeries.getData().size() >= 20) {
+            bidSeries.getData().remove(0);
+        }
+        bidSeries.getData().add(new XYChart.Data<>(label + " #" + chartPointIndex, price));
+        lastChartPrice = price;
     }
 
     private void handlePush(String jsonData) {
@@ -123,7 +212,12 @@ public class BiddingController {
             this.auctionData = updated;
             Platform.runLater(() -> {
                 refreshUI(updated);
-                addChartDataPoint(updated);
+                // ★ Thêm điểm mới vào chart khi giá thay đổi
+                double newPrice = updated.get("currentPrice").getAsDouble();
+                if (newPrice != lastChartPrice) {
+                    String timeLabel = LocalDateTime.now().format(CHART_TIME_FMT);
+                    addChartPoint(timeLabel, newPrice);
+                }
             });
         } catch (Exception e) {
             System.err.println("Lỗi xử lý PUSH: " + e.getMessage());
@@ -193,17 +287,6 @@ public class BiddingController {
         if (cancelAutoBidBtn != null) { cancelAutoBidBtn.setVisible(visible); cancelAutoBidBtn.setManaged(visible); }
         if (autoBidMaxField != null) { autoBidMaxField.setVisible(visible); autoBidMaxField.setManaged(visible); }
         if (autoBidIncrementField != null) { autoBidIncrementField.setVisible(visible); autoBidIncrementField.setManaged(visible); }
-    }
-
-    private void addChartDataPoint(JsonObject data) {
-        if (bidHistoryChart == null || bidSeries == null) return;
-        try {
-            double price = data.get("currentPrice").getAsDouble();
-            String timestamp = LocalDateTime.now().format(TIME_FMT);
-            bidSeries.getData().add(new XYChart.Data<>(timestamp, price));
-        } catch (Exception e) {
-            System.err.println("Chart update error: " + e.getMessage());
-        }
     }
 
     @FXML
