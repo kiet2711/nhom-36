@@ -86,10 +86,26 @@ public class BiddingController {
         endTimeLabel.setText(data.get("endTime").getAsString().replace("T", " "));
         String status = data.get("status").getAsString();
         statusLabel.setText("Trang thai: " + status);
+        
         boolean ended = status.equals("FINISHED") || status.equals("CANCELED");
-        if (placeBidBtn != null) placeBidBtn.setDisable(ended);
-        if (registerAutoBidBtn != null) registerAutoBidBtn.setDisable(ended);
-        if (cancelAutoBidBtn != null) cancelAutoBidBtn.setDisable(ended);
+        boolean isBidder = "BIDDER".equals(SessionManager.getCurrentRole());
+        boolean disableBidding = ended || !isBidder;
+        
+        if (!isBidder) {
+            // Hide the controls entirely for non-bidders
+            if (placeBidBtn != null) { placeBidBtn.setVisible(false); placeBidBtn.setManaged(false); }
+            if (bidAmountField != null) { bidAmountField.setVisible(false); bidAmountField.setManaged(false); }
+            if (registerAutoBidBtn != null) { registerAutoBidBtn.setVisible(false); registerAutoBidBtn.setManaged(false); }
+            if (cancelAutoBidBtn != null) { cancelAutoBidBtn.setVisible(false); cancelAutoBidBtn.setManaged(false); }
+            if (autoBidMaxField != null) { autoBidMaxField.setVisible(false); autoBidMaxField.setManaged(false); }
+            if (autoBidIncrementField != null) { autoBidIncrementField.setVisible(false); autoBidIncrementField.setManaged(false); }
+        } else {
+            // Enable/disable based on whether auction ended
+            if (placeBidBtn != null) placeBidBtn.setDisable(ended);
+            if (registerAutoBidBtn != null) registerAutoBidBtn.setDisable(ended);
+            if (cancelAutoBidBtn != null) cancelAutoBidBtn.setDisable(ended);
+        }
+        
         if (ended) {
             resultLabel.setStyle("-fx-text-fill: gray;");
             resultLabel.setText("Phien dau gia da ket thuc.");
@@ -97,7 +113,15 @@ public class BiddingController {
                 autoBidStatusLabel.setStyle("-fx-text-fill: gray;");
                 autoBidStatusLabel.setText("Phien da ket thuc - Auto-bid khong kha dung.");
             }
+        } else if (!isBidder) {
+            resultLabel.setStyle("-fx-text-fill: orange;");
+            resultLabel.setText("Chỉ Bidder mới được phép đặt giá.");
+            if (autoBidStatusLabel != null) {
+                autoBidStatusLabel.setStyle("-fx-text-fill: orange;");
+                autoBidStatusLabel.setText("Chỉ Bidder mới được phép đăng ký auto-bid.");
+            }
         }
+        
         // ★ Add data point to bid history chart
         addChartDataPoint(data);
     }

@@ -111,6 +111,13 @@ public class AuctionService {
     public Collection<Auction> getAllAuctions() { return auctionManager.getAllAuctions(); }
 
     /**
+     * Trả về các phiên đấu giá mà bidder đã tham gia đặt giá.
+     */
+    public Collection<Auction> getAuctionsByBidder(String bidderId) throws SQLException {
+        return auctionDAO.findAuctionsByBidder(bidderId);
+    }
+
+    /**
      * Đóng phiên đấu giá và dọn dẹp auto-bid registry.
      *
      * @param auctionId ID phiên cần đóng

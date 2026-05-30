@@ -2,6 +2,9 @@ package com.auction.model;
 
 import org.junit.jupiter.api.*;
 import java.time.LocalDateTime;
+import com.auction.exception.AuctionClosedException;
+import com.auction.exception.InvalidBidException;
+import com.auction.exception.UnauthorizedException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,21 +44,21 @@ class AuctionTest {
     @DisplayName("Đặt giá thấp hơn giá hiện tại — ném exception")
     void bidBelowCurrentPriceThrows() {
         auction.placeBid(BIDDER_A, 11_000_000);
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(InvalidBidException.class,
                 () -> auction.placeBid(BIDDER_B, 9_000_000));
     }
 
     @Test
     @DisplayName("Đặt giá bằng giá hiện tại — ném exception")
     void bidEqualCurrentPriceThrows() {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(InvalidBidException.class,
                 () -> auction.placeBid(BIDDER_A, 10_000_000));
     }
 
     @Test
     @DisplayName("Người bán không được tự đấu giá")
     void sellerCannotBid() {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(UnauthorizedException.class,
                 () -> auction.placeBid(SELLER_ID, 15_000_000));
     }
 
@@ -64,7 +67,7 @@ class AuctionTest {
     void bidAfterClosedThrows() {
         auction.placeBid(BIDDER_A, 11_000_000);
         auction.close();
-        assertThrows(IllegalStateException.class,
+        assertThrows(AuctionClosedException.class,
                 () -> auction.placeBid(BIDDER_B, 12_000_000));
     }
 

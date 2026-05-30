@@ -22,6 +22,7 @@ public class DashboardController {
     @FXML private TableColumn<JsonObject, String> colEnd;
     @FXML private Button createAuctionBtn;
     @FXML private Button adminBtn;
+    @FXML private CheckBox filterMyBidsCheck;
 
     private final AuctionClient client = AuctionClient.getInstance();
     private final ObservableList<JsonObject> auctionList = FXCollections.observableArrayList();
@@ -34,6 +35,11 @@ public class DashboardController {
         String role = SessionManager.getCurrentRole();
         createAuctionBtn.setVisible("SELLER".equals(role));
         if (adminBtn != null) adminBtn.setVisible("ADMIN".equals(role));
+        if (filterMyBidsCheck != null) {
+            boolean isBidder = "BIDDER".equals(role);
+            filterMyBidsCheck.setVisible(isBidder);
+            filterMyBidsCheck.setManaged(isBidder);
+        }
 
         colName.setCellValueFactory(d ->
                 new SimpleStringProperty(d.getValue().get("itemName").getAsString()));
@@ -56,7 +62,10 @@ public class DashboardController {
     public void handleRefresh() {
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
-                Request  req = new Request(CommandType.GET_AUCTIONS, null);
+                CommandType cmd = (filterMyBidsCheck != null && filterMyBidsCheck.isSelected()) 
+                                    ? CommandType.GET_MY_BIDS 
+                                    : CommandType.GET_AUCTIONS;
+                Request  req = new Request(cmd, null);
                 Response res = client.send(req);
                 if (res.isOk()) {
                     JsonArray arr = JsonParser.parseString(res.getData()).getAsJsonArray();

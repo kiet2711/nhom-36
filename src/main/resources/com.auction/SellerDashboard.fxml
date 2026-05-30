@@ -4,37 +4,41 @@
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.auction.controller.SellerDashboardController"
-            style="-fx-padding: 20; -fx-min-width: 700; -fx-min-height: 500;">
+            stylesheets="@style.css"
+            styleClass="root"
+            style="-fx-padding: 30; -fx-min-width: 800; -fx-min-height: 600;">
     <top>
-        <HBox spacing="16" alignment="CENTER_LEFT"
-              style="-fx-padding: 0 0 16 0;">
-            <Label text="QUẢN LÝ PHIÊN ĐẤU GIÁ CỦA BẠN"
-                   style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+        <HBox spacing="15" alignment="CENTER_LEFT"
+              style="-fx-padding: 0 0 20 0;">
+            <Label text="Quản Lý Sản Phẩm Đấu Giá"
+                   styleClass="header-label" style="-fx-font-size: 24px;"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Tạo phiên mới" onAction="#handleCreate"/>
-            <Button text="Làm mới"       onAction="#handleRefresh"/>
-            <Button text="← Quay lại"   onAction="#handleBack"/>
+            <Button text="Tạo Phiên Mới" onAction="#handleCreate" styleClass="button" prefHeight="35"/>
+            <Button text="Làm mới"       onAction="#handleRefresh" styleClass="button-secondary" prefHeight="35"/>
+            <Button text="← Quay lại"   onAction="#handleBack" styleClass="button-secondary" prefHeight="35"/>
         </HBox>
     </top>
 
     <center>
-        <TableView fx:id="auctionTable">
-            <columns>
-                <TableColumn fx:id="colName"    text="Sản phẩm"     prefWidth="160"/>
-                <TableColumn fx:id="colType"    text="Loại"         prefWidth="100"/>
-                <TableColumn fx:id="colPrice"   text="Giá hiện tại" prefWidth="120"/>
-                <TableColumn fx:id="colStatus"  text="Trạng thái"   prefWidth="100"/>
-                <TableColumn fx:id="colLeader"  text="Người dẫn đầu" prefWidth="130"/>
-                <TableColumn fx:id="colEnd"     text="Kết thúc"     prefWidth="140"/>
-            </columns>
-        </TableView>
+        <VBox styleClass="card">
+            <TableView fx:id="auctionTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                <columns>
+                    <TableColumn fx:id="colName"    text="Tên Sản Phẩm"  prefWidth="180"/>
+                    <TableColumn fx:id="colType"    text="Phân Loại"     prefWidth="100"/>
+                    <TableColumn fx:id="colPrice"   text="Giá Hiện Tại"  prefWidth="130"/>
+                    <TableColumn fx:id="colStatus"  text="Trạng Thái"    prefWidth="110"/>
+                    <TableColumn fx:id="colLeader"  text="Người Dẫn Đầu" prefWidth="130"/>
+                    <TableColumn fx:id="colEnd"     text="Thời Gian Kết Thúc" prefWidth="150"/>
+                </columns>
+            </TableView>
+        </VBox>
     </center>
 
     <bottom>
-        <HBox spacing="10" style="-fx-padding: 12 0 0 0;">
-            <Button text="Huỷ phiên đã chọn" onAction="#handleCancel"
-                    style="-fx-text-fill: red;"/>
-            <Label fx:id="statusLabel" style="-fx-padding: 4 0 0 10;"/>
+        <HBox spacing="15" style="-fx-padding: 20 0 0 0;" alignment="CENTER_LEFT">
+            <Button text="HUỶ PHIÊN ĐÃ CHỌN" onAction="#handleCancel"
+                    styleClass="button-danger" prefHeight="35"/>
+            <Label fx:id="statusLabel" styleClass="title-label" style="-fx-padding: 4 0 0 10;"/>
         </HBox>
     </bottom>
 </BorderPane>

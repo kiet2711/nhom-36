@@ -2,23 +2,51 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<VBox spacing="12" alignment="CENTER"
+<VBox spacing="15" alignment="CENTER"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.auction.controller.CreateAuctionController"
-      style="-fx-padding: 30; -fx-min-width: 400;">
+      stylesheets="@style.css"
+      styleClass="root"
+      style="-fx-padding: 60; -fx-min-width: 500; -fx-min-height: 600;">
 
-    <Label text="TẠO PHIÊN ĐẤU GIÁ"
-           style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+    <HBox alignment="CENTER_LEFT" maxWidth="450">
+        <Button text="← Quay lại" onAction="#handleBack" styleClass="button-secondary" prefHeight="35"/>
+        <Region HBox.hgrow="ALWAYS"/>
+    </HBox>
 
-    <TextField fx:id="nameField"    promptText="Tên sản phẩm"/>
-    <TextField fx:id="descField"    promptText="Mô tả"/>
-    <TextField fx:id="priceField"   promptText="Giá khởi điểm (VD: 500000)"/>
-    <ComboBox  fx:id="typeCombo"    promptText="Loại sản phẩm"/>
-    <TextField fx:id="endTimeField" promptText="Kết thúc (VD: 2026-05-01T20:00:00)"/>
+    <VBox alignment="CENTER" spacing="20" styleClass="card" maxWidth="450">
+        <Label text="TẠO PHIÊN ĐẤU GIÁ" styleClass="header-label"/>
+        
+        <VBox spacing="10">
+            <Label text="Tên sản phẩm" styleClass="title-label" style="-fx-font-size: 14px;"/>
+            <TextField fx:id="nameField" promptText="Nhập tên sản phẩm..." styleClass="text-field" prefHeight="40"/>
+        </VBox>
 
-    <Button text="Tạo phiên đấu giá" onAction="#handleCreate"
-            style="-fx-font-weight: bold; -fx-min-width: 200;"/>
-    <Button text="← Quay lại" onAction="#handleBack"/>
+        <VBox spacing="10">
+            <Label text="Mô tả" styleClass="title-label" style="-fx-font-size: 14px;"/>
+            <TextField fx:id="descField" promptText="Nhập mô tả sản phẩm..." styleClass="text-field" prefHeight="40"/>
+        </VBox>
+        
+        <HBox spacing="15">
+            <VBox spacing="10" HBox.hgrow="ALWAYS">
+                <Label text="Giá khởi điểm" styleClass="title-label" style="-fx-font-size: 14px;"/>
+                <TextField fx:id="priceField" promptText="VD: 500000" styleClass="text-field" prefHeight="40"/>
+            </VBox>
+            
+            <VBox spacing="10" HBox.hgrow="ALWAYS">
+                <Label text="Loại sản phẩm" styleClass="title-label" style="-fx-font-size: 14px;"/>
+                <ComboBox fx:id="typeCombo" promptText="Chọn loại..." styleClass="text-field" prefHeight="40" maxWidth="Infinity"/>
+            </VBox>
+        </HBox>
 
-    <Label fx:id="resultLabel"/>
+        <VBox spacing="10">
+            <Label text="Thời gian kết thúc" styleClass="title-label" style="-fx-font-size: 14px;"/>
+            <TextField fx:id="endTimeField" promptText="VD: 2026-05-01T20:00:00" styleClass="text-field" prefHeight="40"/>
+        </VBox>
+
+        <Button text="TẠO PHIÊN ĐẤU GIÁ" onAction="#handleCreate"
+                styleClass="button" prefWidth="400" prefHeight="40" style="-fx-margin-top: 15;"/>
+
+        <Label fx:id="resultLabel" styleClass="title-label" wrapText="true" textAlignment="CENTER"/>
+    </VBox>
 </VBox>

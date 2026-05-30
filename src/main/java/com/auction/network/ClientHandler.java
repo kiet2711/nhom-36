@@ -51,6 +51,7 @@ public class ClientHandler implements Runnable, AuctionObserver {
             case LOGIN          -> handleLogin(req);
             case REGISTER       -> handleRegister(req);
             case GET_AUCTIONS   -> handleGetAuctions();
+            case GET_MY_BIDS    -> handleGetMyBids();
             case CREATE_AUCTION    -> handleCreateAuction(req);
             case PLACE_BID         -> handlePlaceBid(req);
             case REGISTER_AUTO_BID -> handleRegisterAutoBid(req);
@@ -71,6 +72,24 @@ public class ClientHandler implements Runnable, AuctionObserver {
             return Response.ok(arr.toString());
         } catch (Exception e) {
             return Response.error("Lỗi lấy danh sách: " + e.getMessage());
+        }
+    }
+
+    private Response handleGetMyBids() {
+        Response loginCheck = requireLogin();
+        if (loginCheck != null) return loginCheck;
+        if (!"BIDDER".equals(loggedInUser.getRole())) {
+            return Response.error("Chỉ Bidder mới có thể xem danh sách đã đấu giá.");
+        }
+        try {
+            Collection<Auction> auctions = auctionSvc.getAuctionsByBidder(loggedInUser.getId());
+            JsonArray arr = new JsonArray();
+            for (Auction a : auctions) {
+                arr.add(auctionToJson(a));
+            }
+            return Response.ok(arr.toString());
+        } catch (Exception e) {
+            return Response.error("Lỗi lấy danh sách phiên đã tham gia: " + e.getMessage());
         }
     }
 
@@ -101,6 +120,9 @@ public class ClientHandler implements Runnable, AuctionObserver {
         /* CHANGED: extract duplicated login check → requireLogin() */
         Response loginCheck = requireLogin();
         if (loginCheck != null) return loginCheck;
+        if (!"BIDDER".equals(loggedInUser.getRole())) {
+            return Response.error("Chỉ Bidder mới có thể đặt giá.");
+        }
         try {
             JsonObject data  = JsonParser.parseString(req.getData()).getAsJsonObject();
             String auctionId = data.get("auctionId").getAsString();
@@ -124,6 +146,9 @@ public class ClientHandler implements Runnable, AuctionObserver {
     private Response handleRegisterAutoBid(Request req) {
         Response loginCheck = requireLogin();
         if (loginCheck != null) return loginCheck;
+        if (!"BIDDER".equals(loggedInUser.getRole())) {
+            return Response.error("Chỉ Bidder mới có thể đăng ký auto-bid.");
+        }
         try {
             JsonObject data  = JsonParser.parseString(req.getData()).getAsJsonObject();
             String auctionId = data.get("auctionId").getAsString();
@@ -147,6 +172,9 @@ public class ClientHandler implements Runnable, AuctionObserver {
     private Response handleCancelAutoBid(Request req) {
         Response loginCheck = requireLogin();
         if (loginCheck != null) return loginCheck;
+        if (!"BIDDER".equals(loggedInUser.getRole())) {
+            return Response.error("Chỉ Bidder mới có thể hủy auto-bid.");
+        }
         try {
             JsonObject data  = JsonParser.parseString(req.getData()).getAsJsonObject();
             String auctionId = data.get("auctionId").getAsString();
@@ -224,6 +252,7 @@ public class ClientHandler implements Runnable, AuctionObserver {
         json.addProperty("status",         a.getStatus().name());
         json.addProperty("endTime",        a.getEndTime().toString());
         json.addProperty("leadingBidder",  a.getLeadingBidderId());
+        json.addProperty("sellerId",       a.getSellerId());
         return json;
     }
 }
