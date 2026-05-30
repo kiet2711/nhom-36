@@ -19,19 +19,13 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+          cache: maven
 
       - name: Build (compile only, skip JavaFX UI)
         run: mvn compile -q
 
       - name: Run Unit Tests
-        run: mvn test -pl . --no-transfer-progress
+        run: mvn test --no-transfer-progress
 
       - name: Upload test report
         if: always()
