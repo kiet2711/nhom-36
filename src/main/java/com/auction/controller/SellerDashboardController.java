@@ -29,15 +29,61 @@ public class SellerDashboardController {
     public void initialize() {
         colName.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().get("itemName").getAsString()));
         colType.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().get("itemType").getAsString()));
-        colPrice.setCellValueFactory(d -> new SimpleStringProperty(String.format("%,.0f d", d.getValue().get("currentPrice").getAsDouble())));
+        colPrice.setCellValueFactory(d -> new SimpleStringProperty(String.format("%,.0f đ", d.getValue().get("currentPrice").getAsDouble())));
         colStatus.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().get("status").getAsString()));
         colLeader.setCellValueFactory(d -> {
             JsonElement leader = d.getValue().get("leadingBidder");
-            return new SimpleStringProperty(leader == null || leader.isJsonNull() ? "Chua co" : leader.getAsString());
+            return new SimpleStringProperty(leader == null || leader.isJsonNull() ? "Chưa có" : leader.getAsString());
         });
         colEnd.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().get("endTime").getAsString().replace("T", " ")));
         auctionTable.setItems(list);
+
+        // ★ Push listener để cập nhật realtime
+        client.setPushListener(this::handlePush);
+
         handleRefresh();
+    }
+
+    /** ★ Xử lý PUSH: cập nhật giá/trạng thái realtime cho phiên của Seller */
+    private void handlePush(String jsonData) {
+        try {
+            JsonObject updated = JsonParser.parseString(jsonData).getAsJsonObject();
+            String auctionId = updated.get("id").getAsString();
+            String sellerId = SessionManager.getCurrentUserId();
+
+            // Chỉ xử lý phiên của Seller hiện tại
+            JsonElement sellerElem = updated.get("sellerId");
+            if (sellerElem == null || !sellerId.equals(sellerElem.getAsString())) return;
+
+            Platform.runLater(() -> {
+                String status = updated.get("status").getAsString();
+                if ("FINISHED".equals(status) || "CANCELED".equals(status)) {
+                    // Xóa phiên đã kết thúc khỏi bảng
+                    list.removeIf(o -> o.get("id").getAsString().equals(auctionId));
+                    statusLabel.setText("Tổng: " + list.size() + " phiên đang mở");
+
+                    if ("FINISHED".equals(status)) {
+                        String itemName = updated.get("itemName").getAsString();
+                        JsonElement leader = updated.get("leadingBidder");
+                        String winner = (leader == null || leader.isJsonNull()) ? "Không có" : leader.getAsString();
+                        String price = String.format("%,.0f đ", updated.get("currentPrice").getAsDouble());
+                        AlertUtil.info("Phiên kết thúc",
+                                "Phiên \"" + itemName + "\" đã kết thúc!\n"
+                                + "Người thắng: " + winner + "\nGiá cuối: " + price);
+                    }
+                } else {
+                    // Cập nhật giá/trạng thái mới
+                    for (int i = 0; i < list.size(); i++) {
+                        if (list.get(i).get("id").getAsString().equals(auctionId)) {
+                            list.set(i, updated);
+                            break;
+                        }
+                    }
+                }
+            });
+        } catch (Exception e) {
+            System.err.println("SellerDashboard PUSH error: " + e.getMessage());
+        }
     }
 
     @FXML
@@ -55,27 +101,27 @@ public class SellerDashboardController {
                         JsonObject o = e.getAsJsonObject();
                         if (sellerId.equals(o.get("sellerId").getAsString())) list.add(o);
                     });
-                    statusLabel.setText("Tong: " + list.size() + " phien");
+                    statusLabel.setText("Tổng: " + list.size() + " phiên đang mở");
                 });
             } catch (Exception e) {
-                Platform.runLater(() -> AlertUtil.error("Loi", e.getMessage()));
+                Platform.runLater(() -> AlertUtil.error("Lỗi", e.getMessage()));
             }
         });
     }
 
     @FXML
     public void handleCreate() {
-        try { SceneManager.switchTo("CreateAuction.fxml"); }
-        catch (Exception e) { AlertUtil.error("Loi", e.getMessage()); }
+        try { client.setPushListener(null); SceneManager.switchTo("CreateAuction.fxml"); }
+        catch (Exception e) { AlertUtil.error("Lỗi", e.getMessage()); }
     }
 
     @FXML
     public void handleCancel() {
         JsonObject selected = auctionTable.getSelectionModel().getSelectedItem();
-        if (selected == null) { AlertUtil.warning("Thong bao", "Vui long chon phien can huy."); return; }
+        if (selected == null) { AlertUtil.warning("Thông báo", "Vui lòng chọn phiên cần hủy."); return; }
         String status = selected.get("status").getAsString();
         if (!status.equals("OPEN") && !status.equals("RUNNING")) {
-            AlertUtil.warning("Thong bao", "Chi co the huy phien dang mo."); return;
+            AlertUtil.warning("Thông báo", "Chỉ có thể hủy phiên đang mở."); return;
         }
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
@@ -84,18 +130,18 @@ public class SellerDashboardController {
                 Request  req = new Request(CommandType.CANCEL_AUCTION, payload.toString());
                 Response res = client.send(req);
                 Platform.runLater(() -> {
-                    if (res.isOk()) { AlertUtil.info("Thanh cong", "Da huy phien."); handleRefresh(); }
-                    else AlertUtil.error("Loi", res.getData());
+                    if (res.isOk()) { AlertUtil.info("Thành công", "Đã hủy phiên."); handleRefresh(); }
+                    else AlertUtil.error("Lỗi", res.getData());
                 });
             } catch (Exception e) {
-                Platform.runLater(() -> AlertUtil.error("Loi", e.getMessage()));
+                Platform.runLater(() -> AlertUtil.error("Lỗi", e.getMessage()));
             }
         });
     }
 
     @FXML
     public void handleBack() {
-        try { SceneManager.switchTo("Dashboard.fxml"); }
-        catch (Exception e) { AlertUtil.error("Loi", e.getMessage()); }
+        try { client.setPushListener(null); SceneManager.switchTo("Dashboard.fxml"); }
+        catch (Exception e) { AlertUtil.error("Lỗi", e.getMessage()); }
     }
 }

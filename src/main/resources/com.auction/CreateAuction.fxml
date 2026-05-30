@@ -7,46 +7,56 @@
       fx:controller="com.auction.controller.CreateAuctionController"
       stylesheets="@style.css"
       styleClass="root"
-      style="-fx-padding: 60; -fx-min-width: 500; -fx-min-height: 600;">
+      style="-fx-padding: 40; -fx-min-width: 500; -fx-min-height: 550;">
 
     <HBox alignment="CENTER_LEFT" maxWidth="450">
         <Button text="← Quay lại" onAction="#handleBack" styleClass="button-secondary" prefHeight="35"/>
         <Region HBox.hgrow="ALWAYS"/>
     </HBox>
 
-    <VBox alignment="CENTER" spacing="20" styleClass="card" maxWidth="450">
-        <Label text="TẠO PHIÊN ĐẤU GIÁ" styleClass="header-label"/>
+    <VBox alignment="CENTER" spacing="15" styleClass="card" maxWidth="450">
+        <Label text="TẠO PHIÊN ĐẤU GIÁ" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
         
-        <VBox spacing="10">
-            <Label text="Tên sản phẩm" styleClass="title-label" style="-fx-font-size: 14px;"/>
-            <TextField fx:id="nameField" promptText="Nhập tên sản phẩm..." styleClass="text-field" prefHeight="40"/>
+        <VBox spacing="5">
+            <Label text="Tên sản phẩm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+            <TextField fx:id="nameField" promptText="Nhập tên sản phẩm..." prefHeight="35"/>
         </VBox>
 
-        <VBox spacing="10">
-            <Label text="Mô tả" styleClass="title-label" style="-fx-font-size: 14px;"/>
-            <TextField fx:id="descField" promptText="Nhập mô tả sản phẩm..." styleClass="text-field" prefHeight="40"/>
+        <VBox spacing="5">
+            <Label text="Mô tả" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+            <TextField fx:id="descField" promptText="Nhập mô tả sản phẩm..." prefHeight="35"/>
         </VBox>
         
-        <HBox spacing="15">
-            <VBox spacing="10" HBox.hgrow="ALWAYS">
-                <Label text="Giá khởi điểm" styleClass="title-label" style="-fx-font-size: 14px;"/>
-                <TextField fx:id="priceField" promptText="VD: 500000" styleClass="text-field" prefHeight="40"/>
+        <HBox spacing="10">
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Giá khởi điểm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+                <TextField fx:id="priceField" promptText="VD: 500000" prefHeight="35"/>
             </VBox>
-            
-            <VBox spacing="10" HBox.hgrow="ALWAYS">
-                <Label text="Loại sản phẩm" styleClass="title-label" style="-fx-font-size: 14px;"/>
-                <ComboBox fx:id="typeCombo" promptText="Chọn loại..." styleClass="text-field" prefHeight="40" maxWidth="Infinity"/>
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Loại sản phẩm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+                <ComboBox fx:id="typeCombo" promptText="Chọn loại..." prefHeight="35" maxWidth="Infinity"/>
             </VBox>
         </HBox>
 
-        <VBox spacing="10">
-            <Label text="Thời gian kết thúc" styleClass="title-label" style="-fx-font-size: 14px;"/>
-            <TextField fx:id="endTimeField" promptText="VD: 2026-05-01T20:00:00" styleClass="text-field" prefHeight="40"/>
+        <VBox spacing="5">
+            <Label text="Ngày kết thúc" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+            <DatePicker fx:id="endDatePicker" prefHeight="35" maxWidth="Infinity"/>
         </VBox>
 
-        <Button text="TẠO PHIÊN ĐẤU GIÁ" onAction="#handleCreate"
-                styleClass="button" prefWidth="400" prefHeight="40" style="-fx-margin-top: 15;"/>
+        <HBox spacing="10">
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Giờ" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+                <Spinner fx:id="hourSpinner" prefHeight="35" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Phút" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+                <Spinner fx:id="minuteSpinner" prefHeight="35" maxWidth="Infinity"/>
+            </VBox>
+        </HBox>
 
-        <Label fx:id="resultLabel" styleClass="title-label" wrapText="true" textAlignment="CENTER"/>
+        <Button text="TẠO PHIÊN ĐẤU GIÁ" onAction="#handleCreate"
+                styleClass="button" prefWidth="400" prefHeight="40"/>
+
+        <Label fx:id="resultLabel" wrapText="true" textAlignment="CENTER"/>
     </VBox>
 </VBox>

@@ -21,6 +21,8 @@ public class SceneManager {
             throw new IOException("Không tìm thấy FXML: " + fxmlName);
         }
         Scene scene = new Scene(loader.load());
+        var cssUrl = SceneManager.class.getResource("/com.auction/style.css");
+        if (cssUrl != null) scene.getStylesheets().add(cssUrl.toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
     }
@@ -33,6 +35,8 @@ public class SceneManager {
             throw new IOException("Không tìm thấy FXML: " + fxmlName);
         }
         Scene scene = new Scene(loader.load());
+        var cssUrl = SceneManager.class.getResource("/com.auction/style.css");
+        if (cssUrl != null) scene.getStylesheets().add(cssUrl.toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();
         return loader.getController();

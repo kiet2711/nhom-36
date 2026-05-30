@@ -18,7 +18,17 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Service trung tâm quản lý toàn bộ nghiệp vụ đấu giá.
- * Singleton, thread-safe qua ReentrantLock per-auction.
+ * 
+ * THỂ HIỆN CÁC DESIGN PATTERN:
+ * 1. SINGLETON PATTERN: Đảm bảo chỉ có duy nhất 1 instance của AuctionService 
+ *    được tạo ra và sử dụng chung trên toàn hệ thống (qua getInstance()).
+ * 2. OBSERVER PATTERN: Đóng vai trò là "Subject", quản lý danh sách các Observer (ClientHandler).
+ *    Khi có thay đổi (ví dụ: có người đặt giá), nó sẽ gọi notifyObservers() để báo cho tất cả.
+ * 
+ * THỂ HIỆN XỬ LÝ CONCURRENT BIDDING (Đồng thời):
+ * - Sử dụng ReentrantLock (khóa) riêng cho từng phiên đấu giá. Đảm bảo tại một thời điểm
+ *   chỉ có 1 thread được thao tác đặt giá trên 1 phiên, tránh lỗi "lost update" hay "race condition".
+ * - Sử dụng ConcurrentHashMap và CopyOnWriteArrayList để đảm bảo an toàn luồng (thread-safe).
  */
 public class AuctionService {
 
@@ -48,6 +58,10 @@ public class AuctionService {
         }
     }
 
+    /**
+     * THỂ HIỆN SINGLETON PATTERN: 
+     * Khởi tạo lazy (chỉ tạo khi được gọi lần đầu) và thread-safe (nhờ từ khóa synchronized).
+     */
     public static synchronized AuctionService getInstance() {
         if (instance == null) instance = new AuctionService();
         return instance;
@@ -118,6 +132,13 @@ public class AuctionService {
     }
 
     /**
+     * Trả về các phiên đấu giá mà bidder đã thắng (FINISHED + leadingBidder = bidderId).
+     */
+    public Collection<Auction> getWonAuctions(String bidderId) throws SQLException {
+        return auctionDAO.findWonAuctions(bidderId);
+    }
+
+    /**
      * Đóng phiên đấu giá và dọn dẹp auto-bid registry.
      *
      * @param auctionId ID phiên cần đóng
@@ -134,6 +155,29 @@ public class AuctionService {
             }
         });
 
+        autoBidRegistry.remove(auctionId);
+    }
+
+    /**
+     * Hủy phiên đấu giá (chỉ dùng cho Seller).
+     */
+    public void cancelAuction(String auctionId, String sellerId) throws Exception {
+        Auction auction = findAuctionOrThrow(auctionId);
+        if (!auction.getSellerId().equals(sellerId)) {
+            throw new IllegalArgumentException("Chỉ người tạo mới có thể hủy phiên.");
+        }
+        ReentrantLock lock = getLock(auctionId);
+        lock.lock();
+        try {
+            if (!auction.isActive()) {
+                throw new IllegalStateException("Chỉ có thể hủy phiên đang hoạt động.");
+            }
+            auction.forceStatus(Auction.Status.CANCELED);
+            auctionDAO.updateStatus(auctionId, Auction.Status.CANCELED.name());
+            notifyObservers(auction);
+        } finally {
+            lock.unlock();
+        }
         autoBidRegistry.remove(auctionId);
     }
 

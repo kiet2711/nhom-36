@@ -20,6 +20,11 @@ public abstract class Item extends Entity {
     /** Mỗi loại item mô tả thêm thông tin riêng */
     public abstract String getType();
 
+    /** 
+     * THỂ HIỆN TÍNH ĐA HÌNH: Trả về thông tin chi tiết đặc thù của từng loại sản phẩm.
+     */
+    public abstract String getDetails();
+
     @Override
     public String toString() {
         return "[" + getType() + "] " + name + " - Giá khởi điểm: " + startingPrice;

@@ -52,10 +52,12 @@ public class ClientHandler implements Runnable, AuctionObserver {
             case REGISTER       -> handleRegister(req);
             case GET_AUCTIONS   -> handleGetAuctions();
             case GET_MY_BIDS    -> handleGetMyBids();
+            case GET_WON_AUCTIONS -> handleGetWonAuctions();
             case CREATE_AUCTION    -> handleCreateAuction(req);
             case PLACE_BID         -> handlePlaceBid(req);
             case REGISTER_AUTO_BID -> handleRegisterAutoBid(req);
             case CANCEL_AUTO_BID   -> handleCancelAutoBid(req);
+            case CANCEL_AUCTION    -> handleCancelAuction(req);
             default -> Response.error("Lệnh chưa hỗ trợ: " + req.getCommand());
         };
     }
@@ -67,11 +69,29 @@ public class ClientHandler implements Runnable, AuctionObserver {
             Collection<Auction> auctions = auctionSvc.getAllAuctions();
             JsonArray arr = new JsonArray();
             for (Auction a : auctions) {
-                arr.add(auctionToJson(a));
+                // Chỉ trả về các phiên đang hoạt động (OPEN/RUNNING) cho Dashboard chính
+                if (a.isActive()) {
+                    arr.add(auctionToJson(a));
+                }
             }
             return Response.ok(arr.toString());
         } catch (Exception e) {
             return Response.error("Lỗi lấy danh sách: " + e.getMessage());
+        }
+    }
+
+    private Response handleGetWonAuctions() {
+        Response loginCheck = requireLogin();
+        if (loginCheck != null) return loginCheck;
+        try {
+            Collection<Auction> auctions = auctionSvc.getWonAuctions(loggedInUser.getId());
+            JsonArray arr = new JsonArray();
+            for (Auction a : auctions) {
+                arr.add(auctionToJson(a));
+            }
+            return Response.ok(arr.toString());
+        } catch (Exception e) {
+            return Response.error("Lỗi lấy danh sách đã thắng: " + e.getMessage());
         }
     }
 
@@ -113,6 +133,20 @@ public class ClientHandler implements Runnable, AuctionObserver {
             return Response.ok(auctionToJson(auction).toString());
         } catch (Exception e) {
             return Response.error("Lỗi tạo phiên: " + e.getMessage());
+        }
+    }
+
+    private Response handleCancelAuction(Request req) {
+        if (loggedInUser == null || !loggedInUser.getRole().equals("SELLER")) {
+            return Response.error("Chỉ Seller mới có thể hủy phiên đấu giá.");
+        }
+        try {
+            JsonObject data  = JsonParser.parseString(req.getData()).getAsJsonObject();
+            String auctionId = data.get("auctionId").getAsString();
+            auctionSvc.cancelAuction(auctionId, loggedInUser.getId());
+            return Response.ok("Đã hủy phiên thành công.");
+        } catch (Exception e) {
+            return Response.error("Lỗi hủy phiên: " + e.getMessage());
         }
     }
 
@@ -245,14 +279,18 @@ public class ClientHandler implements Runnable, AuctionObserver {
     /* CHANGED: đổi tên biến 'o' → 'json' cho rõ nghĩa */
     private JsonObject auctionToJson(Auction a) {
         JsonObject json = new JsonObject();
-        json.addProperty("id",             a.getId());
-        json.addProperty("itemName",       a.getItem().getName());
-        json.addProperty("itemType",       a.getItem().getType());
-        json.addProperty("currentPrice",   a.getCurrentPrice());
-        json.addProperty("status",         a.getStatus().name());
-        json.addProperty("endTime",        a.getEndTime().toString());
-        json.addProperty("leadingBidder",  a.getLeadingBidderId());
-        json.addProperty("sellerId",       a.getSellerId());
+        json.addProperty("id",              a.getId());
+        json.addProperty("itemName",        a.getItem().getName());
+        json.addProperty("itemType",        a.getItem().getType());
+        json.addProperty("itemDescription", a.getItem().getDescription());
+        json.addProperty("itemDetails",     a.getItem().getDetails());
+        json.addProperty("currentPrice",    a.getCurrentPrice());
+        json.addProperty("startingPrice",   a.getItem().getStartingPrice());
+        json.addProperty("status",          a.getStatus().name());
+        json.addProperty("startTime",       a.getStartTime().toString());
+        json.addProperty("endTime",         a.getEndTime().toString());
+        json.addProperty("leadingBidder",   a.getLeadingBidderId());
+        json.addProperty("sellerId",        a.getSellerId());
         return json;
     }
 }

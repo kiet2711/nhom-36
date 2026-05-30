@@ -6,45 +6,65 @@
             fx:controller="com.auction.controller.DashboardController"
             stylesheets="@style.css"
             styleClass="root"
-            style="-fx-padding: 30; -fx-min-width: 800; -fx-min-height: 600;">
+            style="-fx-padding: 20; -fx-min-width: 900; -fx-min-height: 620;">
 
       <top>
-            <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 0 0 20 0;">
-                  <Label text="Đấu Giá" styleClass="header-label" style="-fx-font-size: 28px; -fx-text-fill: #2563eb;"/>
-                  <Region prefWidth="30"/>
-                  <Label fx:id="welcomeLabel" styleClass="title-label" style="-fx-font-size: 16px;"/>
-                  
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 0 0 15 0;">
+                  <Label text="🏷 Đấu Giá Trực Tuyến" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2563eb;"/>
+                  <Region prefWidth="10"/>
+                  <Label fx:id="welcomeLabel" style="-fx-font-size: 14px;"/>
                   <Region HBox.hgrow="ALWAYS"/>
-                  
-                  <Button fx:id="createAuctionBtn" text="+ Tạo Phiên Mới" 
-                          onAction="#handleCreateAuction" styleClass="button" prefHeight="35"/>
-                  <CheckBox fx:id="filterMyBidsCheck" text="Chỉ hiển thị phiên đã tham gia" 
-                            onAction="#handleRefresh" visible="false" managed="false"/>
-                  <Button text="Làm mới" onAction="#handleRefresh" styleClass="button-secondary" prefHeight="35"/>
-                  <Button text="Đăng xuất" onAction="#handleLogout" styleClass="button-danger" prefHeight="35"/>
+                  <Label fx:id="clockLabel" style="-fx-font-size: 13px; -fx-text-fill: #6b7280;"/>
+                  <Region prefWidth="10"/>
+                  <Button fx:id="createAuctionBtn" text="+ Tạo Phiên" 
+                          onAction="#handleCreateAuction" styleClass="button" prefHeight="30"/>
+                  <Button text="Làm mới" onAction="#handleRefresh" styleClass="button-secondary" prefHeight="30"/>
+                  <Button text="Đăng xuất" onAction="#handleLogout" styleClass="button-danger" prefHeight="30"/>
                   <Button fx:id="adminBtn" text="Quản trị"
-                          onAction="#handleAdmin" visible="false" styleClass="button" prefHeight="35"/>
+                          onAction="#handleAdmin" visible="false" styleClass="button" prefHeight="30"/>
             </HBox>
       </top>
 
       <center>
-            <VBox styleClass="card">
-                <TableView fx:id="auctionTable" VBox.vgrow="ALWAYS" styleClass="table-view">
-                      <columns>
-                            <TableColumn fx:id="colName"   text="Tên Sản Phẩm" prefWidth="200"/>
-                            <TableColumn fx:id="colType"   text="Phân Loại"    prefWidth="120"/>
-                            <TableColumn fx:id="colPrice"  text="Giá Hiện Tại" prefWidth="150"/>
-                            <TableColumn fx:id="colStatus" text="Trạng Thái"   prefWidth="120"/>
-                            <TableColumn fx:id="colEnd"    text="Thời Gian Kết Thúc" prefWidth="150"/>
-                      </columns>
-                </TableView>
-            </VBox>
+            <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE" styleClass="card">
+                  <Tab text="📋 Phiên đang diễn ra">
+                        <VBox spacing="5">
+                              <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 5 0;">
+                                    <CheckBox fx:id="filterMyBidsCheck" text="Chỉ hiển thị phiên đã tham gia" 
+                                              onAction="#handleRefresh" visible="false" managed="false"/>
+                              </HBox>
+                              <TableView fx:id="auctionTable" VBox.vgrow="ALWAYS" styleClass="table-view" prefHeight="400">
+                                    <columns>
+                                          <TableColumn fx:id="colName"   text="Tên Sản Phẩm" prefWidth="180"/>
+                                          <TableColumn fx:id="colType"   text="Phân Loại"    prefWidth="100"/>
+                                          <TableColumn fx:id="colPrice"  text="Giá Hiện Tại" prefWidth="130"/>
+                                          <TableColumn fx:id="colStatus" text="Trạng Thái"   prefWidth="100"/>
+                                          <TableColumn fx:id="colEnd"    text="Kết Thúc Lúc" prefWidth="150"/>
+                                          <TableColumn fx:id="colCountdown" text="Còn Lại" prefWidth="100"/>
+                                    </columns>
+                              </TableView>
+                        </VBox>
+                  </Tab>
+                  <Tab fx:id="wonTab" text="🏆 Đã Thắng">
+                        <VBox>
+                              <TableView fx:id="wonTable" VBox.vgrow="ALWAYS" styleClass="table-view" prefHeight="400">
+                                    <columns>
+                                          <TableColumn fx:id="colWonName"  text="Tên Sản Phẩm" prefWidth="200"/>
+                                          <TableColumn fx:id="colWonType"  text="Phân Loại"    prefWidth="100"/>
+                                          <TableColumn fx:id="colWonPrice" text="Giá Trúng"    prefWidth="150"/>
+                                          <TableColumn fx:id="colWonEnd"   text="Ngày Kết Thúc" prefWidth="160"/>
+                                          <TableColumn fx:id="colWonDesc"  text="Mô Tả" prefWidth="250"/>
+                                    </columns>
+                              </TableView>
+                        </VBox>
+                  </Tab>
+            </TabPane>
       </center>
 
       <bottom>
-            <HBox style="-fx-padding: 20 0 0 0;" alignment="CENTER">
+            <HBox style="-fx-padding: 10 0 0 0;" alignment="CENTER">
                   <Button text="THAM GIA ĐẤU GIÁ" onAction="#handleJoinAuction"
-                          styleClass="button" style="-fx-font-size: 16px; -fx-padding: 12 30;"/>
+                          styleClass="button" style="-fx-font-size: 14px; -fx-padding: 10 25;"/>
             </HBox>
       </bottom>
 </BorderPane>

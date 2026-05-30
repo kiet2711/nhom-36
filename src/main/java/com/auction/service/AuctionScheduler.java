@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-/** Kiểm tra và đóng phiên đấu giá hết hạn mỗi 10 giây */
+/** Kiểm tra và đóng phiên đấu giá hết hạn mỗi 3 giây */
 public class AuctionScheduler {
 
     private final ScheduledExecutorService scheduler =
@@ -16,8 +16,8 @@ public class AuctionScheduler {
 
     public void start() {
         scheduler.scheduleAtFixedRate(this::checkExpiredAuctions,
-                0, 10, TimeUnit.SECONDS);
-        System.out.println("AuctionScheduler đã khởi động.");
+                0, 3, TimeUnit.SECONDS);
+        System.out.println("AuctionScheduler đã khởi động (kiểm tra mỗi 3 giây).");
     }
 
     private void checkExpiredAuctions() {
