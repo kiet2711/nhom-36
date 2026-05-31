@@ -278,11 +278,11 @@ mvn test
 
 ## 👥 Thành Viên Nhóm 36
 
-| STT | Họ và Tên | Phụ trách | Keyword khi thầy hỏi |
-|-----|-----------|-----------|-----------------------|
-| 1 | Lữ Thanh Phúc | Server + DB | Multi-thread, DAO, SQLite, schema |
-| 2 | Nguyễn Gia Minh | Client UI | MVC, JavaFX, FXML, Platform.runLater |
-| 3 | Đỗ Tuấn Kiệt | Model + Logic | OOP, Factory Method, Singleton, Scheduler |
-| 4 | Vũ Minh Quang | Network + Test | Socket, BlockingQueue, ReentrantLock, Observer, JUnit |
+| STT | Họ và Tên | Phụ trách |
+|-----|-----------|-----------|
+| 1 | Lữ Thanh Phúc | Server + DB |
+| 2 | Nguyễn Gia Minh | Client UI |
+| 3 | Đỗ Tuấn Kiệt | Model + Logic |
+| 4 | Vũ Minh Quang | Network + Test |
 
 
