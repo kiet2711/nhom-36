@@ -63,8 +63,11 @@ public class CreateAuctionController {
             resultLabel.setText("Giá không hợp lệ."); return;
         }
 
-        int hour   = hourSpinner.getValue();
-        int minute = minuteSpinner.getValue();
+        hourSpinner.commitValue();
+        minuteSpinner.commitValue();
+        int hour   = hourSpinner.getValue() == null ? 0 : hourSpinner.getValue();
+        int minute = minuteSpinner.getValue() == null ? 0 : minuteSpinner.getValue();
+
         LocalDateTime endTime = LocalDateTime.of(date, LocalTime.of(hour, minute, 0));
 
         if (endTime.isBefore(LocalDateTime.now())) {
