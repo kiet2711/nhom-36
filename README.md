@@ -139,7 +139,7 @@ mvn clean compile
 # → Run file: com.auction.network.AuctionServer
 
 # Cách 2: Chạy bằng Maven
-mvn exec:java -Dexec.mainClass="com.auction.network.AuctionServer"
+mvn exec:java "-Dexec.mainClass=com.auction.network.AuctionServer"
 ```
 
 ### Bước 4: Chạy Client
