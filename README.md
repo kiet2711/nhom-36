@@ -6,9 +6,22 @@ Hệ thống đấu giá trực tuyến Client-Server sử dụng Java, JavaFX, 
 
 ---
 
+## 📖 Mô tả bài toán và phạm vi hệ thống
+
+**Bài toán:** Nhu cầu mua bán và đấu giá các mặt hàng trực tuyến cần một hệ thống có khả năng xử lý thời gian thực, đảm bảo tính công bằng, minh bạch và có thể phục vụ nhiều người dùng tham gia đặt giá cùng lúc.
+
+**Phạm vi hệ thống:**
+- Xây dựng hệ thống Client-Server đa luồng (multi-threading) hỗ trợ nhiều kết nối TCP đồng thời.
+- Phục vụ 3 đối tượng người dùng chính: Quản trị viên (Admin), Người bán (Seller), Người mua (Bidder).
+- Quản lý toàn bộ vòng đời của phiên đấu giá: từ lúc tạo, đang diễn ra (nhận giá realtime), cho đến khi kết thúc (xác định người thắng).
+- Tích hợp các cơ chế nâng cao: Đặt giá tự động (Auto-Bid), chống đặt giá giây cuối (Anti-Sniping).
+
+---
+
 ## 📋 Mục Lục
 
-- [Tính năng](#-tính-năng)
+- [Mô tả bài toán và phạm vi](#-mô-tả-bài-toán-và-phạm-vi-hệ-thống)
+- [Danh sách chức năng đã hoàn thành](#-danh-sách-chức-năng-đã-hoàn-thành)
 - [Kiến trúc & Design Pattern](#-kiến-trúc--design-pattern)
 - [Công nghệ](#-công-nghệ)
 - [Cài đặt & Chạy](#-cài-đặt--chạy)
@@ -18,7 +31,7 @@ Hệ thống đấu giá trực tuyến Client-Server sử dụng Java, JavaFX, 
 
 ---
 
-## ✨ Tính Năng
+## ✨ Danh Sách Chức Năng Đã Hoàn Thành
 
 ### Người mua (Bidder)
 - 🔍 Xem danh sách phiên đấu giá đang diễn ra (realtime)
@@ -118,6 +131,8 @@ Hệ thống đấu giá trực tuyến Client-Server sử dụng Java, JavaFX, 
 
 ## 🚀 Cài Đặt & Chạy
 
+> **Lưu ý:** Dự án sử dụng Maven, nên các câu lệnh dòng lệnh dưới đây **chạy được trên mọi hệ điều hành (Windows, Linux, macOS)**. Không yêu cầu cấu hình đặc biệt cho từng OS.
+
 ### Yêu cầu
 - **JDK 17** trở lên
 - **Maven 3.8+**
@@ -133,7 +148,7 @@ cd nhom-36
 mvn clean compile
 ```
 
-### Bước 3: Chạy Server
+### Bước 3: Chạy Server (Bắt buộc chạy trước)
 ```bash
 # Cách 1: Chạy trực tiếp từ IDE (IntelliJ/Eclipse)
 # → Run file: com.auction.network.AuctionServer
@@ -142,7 +157,7 @@ mvn clean compile
 mvn exec:java "-Dexec.mainClass=com.auction.network.AuctionServer"
 ```
 
-### Bước 4: Chạy Client
+### Bước 4: Chạy Client (Chạy sau khi Server đã khởi động)
 ```bash
 # Mở terminal mới
 # → Run file: com.auction.ClientApp
@@ -151,7 +166,7 @@ mvn exec:java "-Dexec.mainClass=com.auction.network.AuctionServer"
 mvn javafx:run
 ```
 
-> **Lưu ý**: Chạy Server trước, sau đó mới chạy Client. Có thể mở nhiều Client cùng lúc để test đấu giá.
+> **Lưu ý**: Có thể mở nhiều Client cùng lúc (mở nhiều terminal và chạy lại lệnh ở Bước 4) để test tính năng đấu giá giữa nhiều người dùng.
 
 ---
 
@@ -264,15 +279,6 @@ mvn test
 | `AuctionServiceConcurrentTest` | 2 | Đấu giá đồng thời từ nhiều thread |
 | `ItemFactoryTest` | 6 | Tạo item đúng loại, xử lý loại không hợp lệ |
 | `ExceptionTest` | 4 | Custom exception messages |
-
----
-
-## 📝 Coding Convention
-
-- **Google Java Style Guide**
-- JavaDoc cho các class và method quan trọng
-- Comment giải thích Design Pattern bằng tiếng Việt
-- Package theo chức năng (model, service, network, db, controller)
 
 ---
 
