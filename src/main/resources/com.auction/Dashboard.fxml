@@ -50,11 +50,13 @@
                         <VBox style="-fx-padding: 15 0 0 0;">
                               <TableView fx:id="wonTable" VBox.vgrow="ALWAYS" styleClass="table-view" prefHeight="450">
                                     <columns>
-                                          <TableColumn fx:id="colWonName"  text="Tên Sản Phẩm" prefWidth="250"/>
-                                          <TableColumn fx:id="colWonType"  text="Phân Loại"    prefWidth="120"/>
-                                          <TableColumn fx:id="colWonPrice" text="Giá Trúng"    prefWidth="160"/>
-                                          <TableColumn fx:id="colWonEnd"   text="Ngày Kết Thúc" prefWidth="180"/>
-                                          <TableColumn fx:id="colWonDesc"  text="Mô Tả" prefWidth="220"/>
+                                          <TableColumn fx:id="colWonName"  text="Tên Sản Phẩm" prefWidth="200"/>
+                                          <TableColumn fx:id="colWonType"  text="Phân Loại"    prefWidth="100"/>
+                                          <TableColumn fx:id="colWonPrice" text="Giá Trúng"    prefWidth="120"/>
+                                          <TableColumn fx:id="colWonEnd"   text="Ngày Kết Thúc" prefWidth="150"/>
+                                          <TableColumn fx:id="colWonDesc"  text="Mô Tả" prefWidth="150"/>
+                                          <TableColumn fx:id="colWonStatus" text="Trạng Thái" prefWidth="120"/>
+                                          <TableColumn fx:id="colWonAction" text="Hành Động" prefWidth="120"/>
                                     </columns>
                               </TableView>
                         </VBox>

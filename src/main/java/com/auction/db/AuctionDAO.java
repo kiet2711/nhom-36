@@ -118,7 +118,7 @@ public class AuctionDAO {
     public List<Auction> findWonAuctions(String bidderId) throws SQLException {
         String sql = "SELECT a.*, i.name, i.description, i.type, i.starting_price " +
                 "FROM auctions a JOIN items i ON a.item_id = i.id " +
-                "WHERE a.status = 'FINISHED' AND a.leading_bidder = ? " +
+                "WHERE a.status IN ('FINISHED', 'PAID') AND a.leading_bidder = ? " +
                 "ORDER BY a.end_time DESC";
         List<Auction> result = new ArrayList<>();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {

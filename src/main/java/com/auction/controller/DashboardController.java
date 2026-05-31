@@ -40,6 +40,8 @@ public class DashboardController {
     @FXML private TableColumn<JsonObject, String> colWonPrice;
     @FXML private TableColumn<JsonObject, String> colWonEnd;
     @FXML private TableColumn<JsonObject, String> colWonDesc;
+    @FXML private TableColumn<JsonObject, String> colWonStatus;
+    @FXML private TableColumn<JsonObject, Void> colWonAction;
 
     @FXML private Button createAuctionBtn;
     @FXML private Button adminBtn;
@@ -116,6 +118,37 @@ public class DashboardController {
                 JsonElement desc = d.getValue().get("itemDescription");
                 return new SimpleStringProperty(desc == null || desc.isJsonNull() ? "" : desc.getAsString());
             });
+            colWonStatus.setCellValueFactory(d -> {
+                String status = d.getValue().get("status").getAsString();
+                return new SimpleStringProperty("PAID".equals(status) ? "Đã thanh toán" : "Chưa thanh toán");
+            });
+            
+            colWonAction.setCellFactory(param -> new TableCell<JsonObject, Void>() {
+                private final Button payBtn = new Button("Thanh toán");
+                {
+                    payBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;");
+                    payBtn.setOnAction(event -> {
+                        JsonObject auction = getTableView().getItems().get(getIndex());
+                        handlePayWonAuction(auction);
+                    });
+                }
+                
+                @Override
+                protected void updateItem(Void item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        JsonObject auction = getTableView().getItems().get(getIndex());
+                        if ("PAID".equals(auction.get("status").getAsString())) {
+                            setGraphic(null); // Hide button if already paid
+                        } else {
+                            setGraphic(payBtn);
+                        }
+                    }
+                }
+            });
+            
             wonTable.setItems(wonList);
         }
 
@@ -264,6 +297,29 @@ public class DashboardController {
         } catch (Exception e) {
             AlertUtil.error("Lỗi", "Không thể mở màn hình: " + e.getMessage());
         }
+    }
+
+    private void handlePayWonAuction(JsonObject auction) {
+        String auctionId = auction.get("id").getAsString();
+        JsonObject reqData = new JsonObject();
+        reqData.addProperty("auctionId", auctionId);
+        
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                Request req = new Request(CommandType.PAY_AUCTION, reqData.toString());
+                Response res = client.send(req);
+                Platform.runLater(() -> {
+                    if (res.isOk()) {
+                        AlertUtil.info("Thành công", "Đã thanh toán thành công!");
+                        loadWonAuctions(); // Refresh the list
+                    } else {
+                        AlertUtil.error("Lỗi thanh toán", res.getData());
+                    }
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> AlertUtil.error("Lỗi", "Không thể thanh toán: " + e.getMessage()));
+            }
+        });
     }
 
     @FXML
