@@ -290,5 +290,7 @@ mvn test
 | 2 | Nguyễn Gia Minh | Client UI |
 | 3 | Đỗ Tuấn Kiệt | Model + Logic |
 | 4 | Vũ Minh Quang | Network + Test |
+ 
 
+Link video test và file pdf: https://drive.google.com/drive/folders/16km9XnR2N1Dpz_WD9FNCYyoEh6-TYMxc?usp=sharing
 
