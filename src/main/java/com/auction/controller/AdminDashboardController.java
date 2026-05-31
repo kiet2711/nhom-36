@@ -55,7 +55,11 @@ public class AdminDashboardController {
     @FXML
     public void initialize() {
         // Init Auction Table
-        colAuctionId.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().get("id").getAsString().substring(0, 8) + "..."));
+        // Init Auction Table
+        colAuctionId.setCellValueFactory(d -> {
+            String id = d.getValue().get("id").getAsString();
+            return new SimpleStringProperty(id.length() > 8 ? id.substring(0, 8) + "..." : id);
+        });
         colAuctionName.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().get("itemName").getAsString()));
         colAuctionPrice.setCellValueFactory(d -> new SimpleStringProperty(String.format("%,.0f đ", d.getValue().get("currentPrice").getAsDouble())));
         colAuctionStatus.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().get("status").getAsString()));
