@@ -247,12 +247,15 @@ public class DashboardController {
 
     @FXML
     public void handleJoinAuction() {
-        JsonObject selected = auctionTable.getSelectionModel().getSelectedItem();
-        if (selected == null) { AlertUtil.warning("Thông báo", "Vui lòng chọn một phiên đấu giá."); return; }
-        String status = selected.get("status").getAsString();
-        if (status.equals("FINISHED") || status.equals("CANCELED")) {
-            AlertUtil.warning("Thông báo", "Phiên đấu giá này đã kết thúc."); return;
+        JsonObject selected = null;
+        if (wonTab != null && mainTabPane.getSelectionModel().getSelectedItem() == wonTab) {
+            selected = wonTable.getSelectionModel().getSelectedItem();
+        } else {
+            selected = auctionTable.getSelectionModel().getSelectedItem();
         }
+        
+        if (selected == null) { AlertUtil.warning("Thông báo", "Vui lòng chọn một phiên đấu giá."); return; }
+        
         try {
             stopTimelines();
             client.setPushListener(null); // clear push listener trước khi chuyển màn

@@ -1,59 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.auction.controller.DashboardController"
             stylesheets="@style.css"
             styleClass="root"
-            style="-fx-padding: 20; -fx-min-width: 900; -fx-min-height: 620;">
+            style="-fx-padding: 30; -fx-min-width: 1000; -fx-min-height: 700;">
 
       <top>
-            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 0 0 15 0;">
-                  <Label text="🏷 Đấu Giá Trực Tuyến" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2563eb;"/>
-                  <Region prefWidth="10"/>
-                  <Label fx:id="welcomeLabel" style="-fx-font-size: 14px;"/>
+            <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 0 0 25 0; -fx-border-color: transparent transparent #e5e7eb transparent; -fx-border-width: 0 0 1 0; -fx-margin-bottom: 20;">
+                  <Label text="🏆 SÀN ĐẤU GIÁ TRỰC TUYẾN" styleClass="label-title"/>
+                  <Region prefWidth="15"/>
+                  <Label fx:id="welcomeLabel" style="-fx-font-size: 15px; -fx-text-fill: #4b5563; -fx-font-weight: bold;"/>
                   <Region HBox.hgrow="ALWAYS"/>
-                  <Label fx:id="clockLabel" style="-fx-font-size: 13px; -fx-text-fill: #6b7280;"/>
-                  <Region prefWidth="10"/>
-                  <Button fx:id="createAuctionBtn" text="+ Tạo Phiên" 
-                          onAction="#handleCreateAuction" styleClass="button" prefHeight="30"/>
-                  <Button text="Làm mới" onAction="#handleRefresh" styleClass="button-secondary" prefHeight="30"/>
-                  <Button text="Đăng xuất" onAction="#handleLogout" styleClass="button-danger" prefHeight="30"/>
-                  <Button fx:id="adminBtn" text="Quản trị"
-                          onAction="#handleAdmin" visible="false" styleClass="button" prefHeight="30"/>
+                  <Label fx:id="clockLabel" style="-fx-font-size: 14px; -fx-text-fill: #9ca3af; -fx-background-color: white; -fx-padding: 5 10; -fx-background-radius: 20; -fx-border-color: #e5e7eb; -fx-border-radius: 20;"/>
+                  <Region prefWidth="15"/>
+                  <Button fx:id="createAuctionBtn" text="+ Tạo Phiên Mới" 
+                          onAction="#handleCreateAuction" styleClass="button" prefHeight="35"/>
+                  <Button text="Làm mới" onAction="#handleRefresh" styleClass="button-secondary" prefHeight="35"/>
+                  <Button text="Đăng xuất" onAction="#handleLogout" styleClass="button-danger" prefHeight="35"/>
+                  <Button fx:id="adminBtn" text="Quản trị hệ thống"
+                          onAction="#handleAdmin" visible="false" styleClass="button" prefHeight="35"/>
             </HBox>
       </top>
 
       <center>
-            <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE" styleClass="card">
-                  <Tab text="📋 Phiên đang diễn ra">
-                        <VBox spacing="5">
-                              <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 5 0;">
-                                    <CheckBox fx:id="filterMyBidsCheck" text="Chỉ hiển thị phiên đã tham gia" 
-                                              onAction="#handleRefresh" visible="false" managed="false"/>
+            <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE" styleClass="card" style="-fx-margin-top: 20;">
+                  <Tab text="🔥 CÁC PHIÊN ĐANG DIỄN RA">
+                        <VBox spacing="15" style="-fx-padding: 15 0 0 0;">
+                              <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <CheckBox fx:id="filterMyBidsCheck" text="Chỉ hiển thị các phiên tôi đang tham gia" 
+                                              onAction="#handleRefresh" visible="false" managed="false" style="-fx-font-size: 14px; -fx-text-fill: #374151;"/>
                               </HBox>
-                              <TableView fx:id="auctionTable" VBox.vgrow="ALWAYS" styleClass="table-view" prefHeight="400">
+                              <TableView fx:id="auctionTable" VBox.vgrow="ALWAYS" styleClass="table-view" prefHeight="450">
                                     <columns>
-                                          <TableColumn fx:id="colName"   text="Tên Sản Phẩm" prefWidth="180"/>
-                                          <TableColumn fx:id="colType"   text="Phân Loại"    prefWidth="100"/>
-                                          <TableColumn fx:id="colPrice"  text="Giá Hiện Tại" prefWidth="130"/>
-                                          <TableColumn fx:id="colStatus" text="Trạng Thái"   prefWidth="100"/>
-                                          <TableColumn fx:id="colEnd"    text="Kết Thúc Lúc" prefWidth="150"/>
-                                          <TableColumn fx:id="colCountdown" text="Còn Lại" prefWidth="100"/>
+                                          <TableColumn fx:id="colName"   text="Tên Sản Phẩm" prefWidth="220"/>
+                                          <TableColumn fx:id="colType"   text="Phân Loại"    prefWidth="120"/>
+                                          <TableColumn fx:id="colPrice"  text="Giá Hiện Tại" prefWidth="150"/>
+                                          <TableColumn fx:id="colStatus" text="Trạng Thái"   prefWidth="120"/>
+                                          <TableColumn fx:id="colEnd"    text="Thời Gian Kết Thúc" prefWidth="170"/>
+                                          <TableColumn fx:id="colCountdown" text="Còn Lại" prefWidth="130"/>
                                     </columns>
                               </TableView>
                         </VBox>
                   </Tab>
-                  <Tab fx:id="wonTab" text="🏆 Đã Thắng">
-                        <VBox>
-                              <TableView fx:id="wonTable" VBox.vgrow="ALWAYS" styleClass="table-view" prefHeight="400">
+                  <Tab fx:id="wonTab" text="🎉 SẢN PHẨM ĐÃ THẮNG">
+                        <VBox style="-fx-padding: 15 0 0 0;">
+                              <TableView fx:id="wonTable" VBox.vgrow="ALWAYS" styleClass="table-view" prefHeight="450">
                                     <columns>
-                                          <TableColumn fx:id="colWonName"  text="Tên Sản Phẩm" prefWidth="200"/>
-                                          <TableColumn fx:id="colWonType"  text="Phân Loại"    prefWidth="100"/>
-                                          <TableColumn fx:id="colWonPrice" text="Giá Trúng"    prefWidth="150"/>
-                                          <TableColumn fx:id="colWonEnd"   text="Ngày Kết Thúc" prefWidth="160"/>
-                                          <TableColumn fx:id="colWonDesc"  text="Mô Tả" prefWidth="250"/>
+                                          <TableColumn fx:id="colWonName"  text="Tên Sản Phẩm" prefWidth="250"/>
+                                          <TableColumn fx:id="colWonType"  text="Phân Loại"    prefWidth="120"/>
+                                          <TableColumn fx:id="colWonPrice" text="Giá Trúng"    prefWidth="160"/>
+                                          <TableColumn fx:id="colWonEnd"   text="Ngày Kết Thúc" prefWidth="180"/>
+                                          <TableColumn fx:id="colWonDesc"  text="Mô Tả" prefWidth="220"/>
                                     </columns>
                               </TableView>
                         </VBox>
@@ -62,9 +63,9 @@
       </center>
 
       <bottom>
-            <HBox style="-fx-padding: 10 0 0 0;" alignment="CENTER">
-                  <Button text="XEM CHI TIẾT SẢN PHẨM" onAction="#handleJoinAuction"
-                          styleClass="button" style="-fx-font-size: 14px; -fx-padding: 10 25;"/>
+            <HBox style="-fx-padding: 20 0 0 0;" alignment="CENTER">
+                  <Button text="VÀO XEM CHI TIẾT SẢN PHẨM" onAction="#handleJoinAuction"
+                          styleClass="button-action" style="-fx-font-size: 16px; -fx-padding: 15 40; -fx-background-radius: 30;"/>
             </HBox>
       </bottom>
 </BorderPane>

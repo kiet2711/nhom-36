@@ -1,125 +1,208 @@
-/* style.css - JavaFX Stylesheet for Auction System */
+/* style.css - Premium JavaFX Stylesheet for Auction System */
 
 .root {
-    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-family: "Segoe UI", "Open Sans", "Roboto", sans-serif;
     -fx-background-color: #f4f6f9;
 }
 
+/* Primary Button (e.g., Bid, Create) */
 .button {
-    -fx-background-color: #3498db;
+    -fx-background-color: linear-gradient(to right, #1d4ed8, #2563eb);
     -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-padding: 8 15 8 15;
-    -fx-background-radius: 5;
+    -fx-padding: 10 20 10 20;
+    -fx-background-radius: 6;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(37, 99, 235, 0.4), 8, 0, 0, 4);
 }
-
 .button:hover {
-    -fx-background-color: #2980b9;
+    -fx-background-color: linear-gradient(to right, #1e40af, #1d4ed8);
+    -fx-effect: dropshadow(three-pass-box, rgba(37, 99, 235, 0.6), 12, 0, 0, 6);
 }
-
 .button:disabled {
-    -fx-background-color: #bdc3c7;
-    -fx-text-fill: #7f8c8d;
+    -fx-background-color: #e5e7eb;
+    -fx-text-fill: #9ca3af;
+    -fx-effect: none;
 }
 
+/* Secondary Button (e.g., Back, Refresh) */
 .button-secondary {
-    -fx-background-color: #95a5a6;
-    -fx-text-fill: white;
+    -fx-background-color: white;
+    -fx-text-fill: #4b5563;
     -fx-font-weight: bold;
     -fx-padding: 8 15 8 15;
-    -fx-background-radius: 5;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: #d1d5db;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 4, 0, 0, 2);
 }
 .button-secondary:hover {
-    -fx-background-color: #7f8c8d;
+    -fx-background-color: #f9fafb;
+    -fx-border-color: #9ca3af;
+    -fx-text-fill: #1f2937;
 }
 
+/* Danger Button (e.g., Logout, Cancel) */
 .button-danger {
-    -fx-background-color: #e74c3c;
-    -fx-text-fill: white;
+    -fx-background-color: white;
+    -fx-text-fill: #dc2626;
     -fx-font-weight: bold;
     -fx-padding: 8 15 8 15;
-    -fx-background-radius: 5;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: #fca5a5;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(220, 38, 38, 0.1), 4, 0, 0, 2);
 }
 .button-danger:hover {
-    -fx-background-color: #c0392b;
+    -fx-background-color: #fef2f2;
+    -fx-border-color: #ef4444;
 }
 
+/* Action Button (e.g., Place Bid - Highly visible) */
+.button-action {
+    -fx-background-color: linear-gradient(to right, #ea580c, #f97316);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 12 24 12 24;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(234, 88, 12, 0.4), 10, 0, 0, 5);
+}
+.button-action:hover {
+    -fx-background-color: linear-gradient(to right, #c2410c, #ea580c);
+    -fx-effect: dropshadow(three-pass-box, rgba(234, 88, 12, 0.6), 14, 0, 0, 7);
+}
+
+/* Cards */
 .card {
     -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 15, 0, 0, 8);
+    -fx-padding: 24;
+}
+
+/* Card Header */
+.card-header {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1f2937;
+}
+
+/* Typography */
+.label {
+    -fx-text-fill: #374151;
+    -fx-font-size: 14px;
+}
+.label-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e3a8a; /* Very dark blue */
+}
+.label-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #6b7280;
+}
+.label-price-large {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #dc2626; /* Bright red */
+}
+.label-countdown {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ea580c;
+    -fx-background-color: #fff7ed;
+    -fx-padding: 8 16 8 16;
     -fx-background-radius: 8;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);
+    -fx-border-color: #ffedd5;
+    -fx-border-radius: 8;
+}
+.label-highlight {
+    -fx-font-weight: bold;
+    -fx-text-fill: #047857; /* Emerald green for winner/leading */
+}
+
+/* Text Fields */
+.text-field {
+    -fx-padding: 10 12 10 12;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: #d1d5db;
+    -fx-background-color: #f9fafb;
+}
+.text-field:focused {
+    -fx-border-color: #3b82f6;
+    -fx-background-color: white;
+}
+
+/* Bid Panel (Highlight Box) */
+.bid-panel {
+    -fx-background-color: #eff6ff;
+    -fx-border-color: #bfdbfe;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
     -fx-padding: 20;
 }
 
-.label {
-    -fx-text-fill: #2c3e50;
-    -fx-font-size: 14px;
-}
-
-.label-title {
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #2c3e50;
-}
-
-.text-field {
-    -fx-padding: 8;
-    -fx-background-radius: 5;
-    -fx-border-radius: 5;
-    -fx-border-color: #bdc3c7;
-}
-
+/* Table View */
 .table-view {
-    -fx-border-color: #bdc3c7;
-    -fx-border-radius: 5;
-    -fx-background-radius: 5;
+    -fx-border-color: transparent;
+    -fx-background-radius: 8;
+    -fx-background-color: white;
 }
-
 .table-view .column-header {
-    -fx-background-color: #ecf0f1;
+    -fx-background-color: #f3f4f6;
     -fx-font-weight: bold;
-    -fx-text-fill: #2c3e50;
+    -fx-padding: 10 0 10 0;
 }
-
+.table-view .column-header .label {
+    -fx-text-fill: #4b5563;
+    -fx-font-size: 13px;
+}
+.table-row-cell {
+    -fx-cell-size: 44px;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: #f3f4f6;
+}
+.table-row-cell:hover {
+    -fx-background-color: #f8fafc;
+}
 .table-row-cell:selected {
-    -fx-background-color: #3498db;
-    -fx-text-fill: white;
+    -fx-background-color: #eff6ff;
+    -fx-text-fill: #1d4ed8;
+}
+.table-row-cell:selected .text {
+    -fx-fill: #1d4ed8;
 }
 
 /* ★ Line Chart Styling */
 .chart-series-line {
-    -fx-stroke: #3b82f6;
-    -fx-stroke-width: 2.5px;
+    -fx-stroke: #2563eb;
+    -fx-stroke-width: 3px;
 }
-
 .chart-line-symbol {
-    -fx-background-color: #2563eb, white;
+    -fx-background-color: #1d4ed8, white;
     -fx-background-insets: 0, 2;
-    -fx-background-radius: 5px;
-    -fx-padding: 4px;
+    -fx-background-radius: 6px;
+    -fx-padding: 5px;
 }
-
 .chart-plot-background {
-    -fx-background-color: #fafbfc;
+    -fx-background-color: transparent;
 }
-
 .axis-label {
-    -fx-font-size: 11px;
+    -fx-font-size: 12px;
     -fx-text-fill: #6b7280;
 }
-
 .axis-tick-mark {
-    -fx-stroke: #d1d5db;
+    -fx-stroke: #e5e7eb;
 }
-
 .chart-horizontal-grid-lines {
     -fx-stroke: #e5e7eb;
-    -fx-stroke-dash-array: 4 4;
+    -fx-stroke-dash-array: 5 5;
 }
-
 .chart-vertical-grid-lines {
     -fx-stroke: transparent;
 }
