@@ -201,6 +201,48 @@ public class AuctionService {
         autoBidRegistry.remove(auctionId);
     }
 
+    public void payAuction(String auctionId, String bidderId) throws Exception {
+        Auction auction = findAuctionOrThrow(auctionId);
+        ReentrantLock lock = getLock(auctionId);
+        lock.lock();
+        try {
+            if (auction.getStatus() != Auction.Status.FINISHED) {
+                throw new IllegalStateException("Phiên đấu giá chưa kết thúc.");
+            }
+            if (auction.getLeadingBidderId() == null || !auction.getLeadingBidderId().equals(bidderId)) {
+                throw new IllegalArgumentException("Chỉ người thắng mới có thể thanh toán.");
+            }
+            auction.forceStatus(Auction.Status.PAID);
+            auctionDAO.updateStatus(auctionId, Auction.Status.PAID.name());
+            notifyObservers(auction);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void updateAuction(String auctionId, String sellerId, String name, String desc, double price, LocalDateTime endTime) throws Exception {
+        Auction auction = findAuctionOrThrow(auctionId);
+        if (!auction.getSellerId().equals(sellerId)) {
+            throw new IllegalArgumentException("Chỉ người tạo mới có thể sửa phiên.");
+        }
+        ReentrantLock lock = getLock(auctionId);
+        lock.lock();
+        try {
+            if (auction.getStatus() != Auction.Status.OPEN) {
+                throw new IllegalStateException("Chỉ có thể sửa phiên đang OPEN.");
+            }
+            auction.getItem().setName(name);
+            auction.getItem().setDescription(desc);
+            auction.getItem().setStartingPrice(price);
+            auction.forceCurrentPrice(price);
+            auction.setEndTime(endTime);
+            auctionDAO.updateAuctionInfo(auctionId, name, desc, price, endTime);
+            notifyObservers(auction);
+        } finally {
+            lock.unlock();
+        }
+    }
+
     // ======================== AUTO-BID API ========================
 
     /**

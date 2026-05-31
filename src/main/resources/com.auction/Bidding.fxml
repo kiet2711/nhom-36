@@ -89,6 +89,7 @@
                 <VBox fx:id="winnerBox" visible="false" managed="false" alignment="CENTER" spacing="5"
                       style="-fx-background-color: #fef3c7; -fx-padding: 10; -fx-background-radius: 5;">
                     <Label fx:id="winnerLabel" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #b45309;" wrapText="true"/>
+                    <Button fx:id="payBtn" text="Xác nhận thanh toán" onAction="#handlePay" styleClass="button" visible="false" managed="false"/>
                 </VBox>
             </VBox>
         </HBox>

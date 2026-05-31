@@ -36,6 +36,8 @@
 
     <bottom>
         <HBox spacing="15" style="-fx-padding: 20 0 0 0;" alignment="CENTER_LEFT">
+            <Button text="SỬA PHIÊN ĐÃ CHỌN" onAction="#handleEdit"
+                    styleClass="button" prefHeight="35"/>
             <Button text="HUỶ PHIÊN ĐÃ CHỌN" onAction="#handleCancel"
                     styleClass="button-danger" prefHeight="35"/>
             <Label fx:id="statusLabel" styleClass="title-label" style="-fx-padding: 4 0 0 10;"/>

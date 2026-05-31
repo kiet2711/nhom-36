@@ -62,6 +62,24 @@ public class AuctionDAO {
         }
     }
 
+    public void updateAuctionInfo(String auctionId, String name, String desc, double price, LocalDateTime endTime) throws SQLException {
+        String itemSql = "UPDATE items SET name=?, description=?, starting_price=? WHERE id=(SELECT item_id FROM auctions WHERE id=?)";
+        try (PreparedStatement ps = conn.prepareStatement(itemSql)) {
+            ps.setString(1, name);
+            ps.setString(2, desc);
+            ps.setDouble(3, price);
+            ps.setString(4, auctionId);
+            ps.executeUpdate();
+        }
+        String auctionSql = "UPDATE auctions SET end_time=?, current_price=? WHERE id=?";
+        try (PreparedStatement ps = conn.prepareStatement(auctionSql)) {
+            ps.setString(1, endTime.toString());
+            ps.setDouble(2, price);
+            ps.setString(3, auctionId);
+            ps.executeUpdate();
+        }
+    }
+
     /** ★ Anti-sniping: Cập nhật endTime mới xuống DB */
     public void updateEndTime(String auctionId, LocalDateTime newEndTime) throws SQLException {
         String sql = "UPDATE auctions SET end_time=? WHERE id=?";

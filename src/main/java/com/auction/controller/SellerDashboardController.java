@@ -140,6 +140,23 @@ public class SellerDashboardController {
     }
 
     @FXML
+    public void handleEdit() {
+        JsonObject selected = auctionTable.getSelectionModel().getSelectedItem();
+        if (selected == null) { AlertUtil.warning("Thông báo", "Vui lòng chọn phiên cần sửa."); return; }
+        String status = selected.get("status").getAsString();
+        if (!status.equals("OPEN")) {
+            AlertUtil.warning("Thông báo", "Chỉ có thể sửa phiên đang OPEN (chưa bắt đầu đấu giá)."); return;
+        }
+        try {
+            client.setPushListener(null);
+            EditAuctionController ctrl = SceneManager.switchToAndGetController("EditAuction.fxml");
+            ctrl.loadAuction(selected);
+        } catch (Exception e) {
+            AlertUtil.error("Lỗi", e.getMessage());
+        }
+    }
+
+    @FXML
     public void handleBack() {
         try { client.setPushListener(null); SceneManager.switchTo("Dashboard.fxml"); }
         catch (Exception e) { AlertUtil.error("Lỗi", e.getMessage()); }

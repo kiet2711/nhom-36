@@ -65,6 +65,8 @@ public class ClientHandler implements Runnable, AuctionObserver {
             case DELETE_USER       -> handleDeleteUser(req);
             case ADMIN_FORCE_FINISH_AUCTION -> handleAdminForceFinishAuction(req);
             case GET_ALL_BIDS      -> handleGetAllBids();
+            case PAY_AUCTION       -> handlePayAuction(req);
+            case UPDATE_AUCTION    -> handleUpdateAuction(req);
             default -> Response.error("Lệnh chưa hỗ trợ: " + req.getCommand());
         };
     }
@@ -180,6 +182,39 @@ public class ClientHandler implements Runnable, AuctionObserver {
             return Response.ok("Đã hủy phiên.");
         } catch (Exception e) {
             return Response.error("Lỗi: " + e.getMessage());
+        }
+    }
+
+    private Response handlePayAuction(Request req) {
+        Response loginCheck = requireLogin();
+        if (loginCheck != null) return loginCheck;
+        try {
+            JsonObject data = JsonParser.parseString(req.getData()).getAsJsonObject();
+            String auctionId = data.get("auctionId").getAsString();
+            auctionSvc.payAuction(auctionId, loggedInUser.getId());
+            return Response.ok("Thanh toán thành công.");
+        } catch (Exception e) {
+            return Response.error("Lỗi: " + e.getMessage());
+        }
+    }
+
+    private Response handleUpdateAuction(Request req) {
+        if (loggedInUser == null || !loggedInUser.getRole().equals("SELLER")) {
+            return Response.error("Chỉ Seller mới có thể sửa phiên đấu giá.");
+        }
+        try {
+            JsonObject data = JsonParser.parseString(req.getData()).getAsJsonObject();
+            String auctionId = data.get("auctionId").getAsString();
+            String name      = data.get("name").getAsString();
+            String desc      = data.get("description").getAsString();
+            double price     = data.get("startingPrice").getAsDouble();
+            String endTimeStr= data.get("endTime").getAsString();
+            LocalDateTime endTime = LocalDateTime.parse(endTimeStr);
+
+            auctionSvc.updateAuction(auctionId, loggedInUser.getId(), name, desc, price, endTime);
+            return Response.ok("Cập nhật phiên đấu giá thành công.");
+        } catch (Exception e) {
+            return Response.error("Lỗi cập nhật: " + e.getMessage());
         }
     }
 

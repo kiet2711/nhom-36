@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.auction.controller.ItemDetailController"
+            stylesheets="@style.css"
+            styleClass="root"
+            style="-fx-padding: 30; -fx-min-width: 600; -fx-min-height: 500;">
+    <top>
+        <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 0 0 20 0;">
+            <Button text="← Quay lại" onAction="#handleBack" styleClass="button-secondary" prefHeight="35"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="Chi Tiết Sản Phẩm" styleClass="header-label" style="-fx-font-size: 24px;"/>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="15" styleClass="card" maxWidth="600" alignment="TOP_LEFT">
+            <Label fx:id="nameLabel" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e40af;"/>
+            
+            <GridPane hgap="20" vgap="15">
+                <Label text="Loại sản phẩm:" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-font-weight: bold;"/>
+                <Label fx:id="typeLabel" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="Thông tin chi tiết:" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-font-weight: bold;"/>
+                <Label fx:id="detailLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" wrapText="true" maxWidth="400"/>
+
+                <Label text="Mô tả:" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-font-weight: bold;"/>
+                <Label fx:id="descLabel" GridPane.columnIndex="1" GridPane.rowIndex="2" wrapText="true" maxWidth="400"/>
+
+                <Label text="Giá khởi điểm:" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-font-weight: bold;"/>
+                <Label fx:id="startPriceLabel" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+                <Label text="Giá hiện tại:" GridPane.columnIndex="0" GridPane.rowIndex="4" style="-fx-font-weight: bold;"/>
+                <Label fx:id="currentPriceLabel" GridPane.columnIndex="1" GridPane.rowIndex="4" style="-fx-font-weight: bold; -fx-text-fill: #ef4444; -fx-font-size: 16px;"/>
+
+                <Label text="Người bán:" GridPane.columnIndex="0" GridPane.rowIndex="5" style="-fx-font-weight: bold;"/>
+                <Label fx:id="sellerLabel" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+
+                <Label text="Kết thúc lúc:" GridPane.columnIndex="0" GridPane.rowIndex="6" style="-fx-font-weight: bold;"/>
+                <Label fx:id="endTimeLabel" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+            </GridPane>
+
+            <HBox spacing="20" alignment="CENTER" style="-fx-padding: 30 0 0 0;">
+                <Button fx:id="joinBtn" text="THAM GIA ĐẤU GIÁ" onAction="#handleJoinAuction" styleClass="button" prefHeight="45" prefWidth="200" style="-fx-font-size: 16px;"/>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

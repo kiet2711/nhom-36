@@ -48,6 +48,7 @@ public class BiddingController {
     // Winner notification
     @FXML private VBox  winnerBox;
     @FXML private Label winnerLabel;
+    @FXML private Button payBtn;
 
     // Format: chỉ hiện giờ:phút cho gọn trên trục X
     private static final DateTimeFormatter CHART_TIME_FMT = DateTimeFormatter.ofPattern("HH:mm");
@@ -242,17 +243,31 @@ public class BiddingController {
         if (ended && winnerBox != null) {
             winnerBox.setVisible(true);
             winnerBox.setManaged(true);
-            if (status.equals("FINISHED")) {
+            if (payBtn != null) {
+                payBtn.setVisible(false);
+                payBtn.setManaged(false);
+            }
+            if (status.equals("FINISHED") || status.equals("PAID")) {
                 String winnerId = (leader == null || leader.isJsonNull()) ? "Không xác định" : leader.getAsString();
                 boolean isWinner = winnerId.equals(SessionManager.getCurrentUserId());
                 if (isWinner) {
-                    winnerLabel.setText("🎉 CHÚC MỪNG! Bạn đã thắng phiên đấu giá này với giá " 
-                            + String.format("%,.0f đ", data.get("currentPrice").getAsDouble()) + "!");
+                    if (status.equals("PAID")) {
+                        winnerLabel.setText("🎉 CHÚC MỪNG! Bạn đã thắng phiên đấu giá này với giá " 
+                                + String.format("%,.0f đ", data.get("currentPrice").getAsDouble()) + "!\n(Đã Thanh Toán)");
+                    } else {
+                        winnerLabel.setText("🎉 CHÚC MỪNG! Bạn đã thắng phiên đấu giá này với giá " 
+                                + String.format("%,.0f đ", data.get("currentPrice").getAsDouble()) + "!");
+                        if (payBtn != null) {
+                            payBtn.setVisible(true);
+                            payBtn.setManaged(true);
+                        }
+                    }
                     winnerBox.setStyle("-fx-background-color: #d1fae5; -fx-padding: 10; -fx-background-radius: 5;");
                     winnerLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #065f46;");
                 } else {
                     winnerLabel.setText("🏆 Phiên kết thúc! Người thắng: " + winnerId 
-                            + " | Giá cuối: " + String.format("%,.0f đ", data.get("currentPrice").getAsDouble()));
+                            + " | Giá cuối: " + String.format("%,.0f đ", data.get("currentPrice").getAsDouble())
+                            + (status.equals("PAID") ? " (Đã Thanh Toán)" : ""));
                     winnerBox.setStyle("-fx-background-color: #fef3c7; -fx-padding: 10; -fx-background-radius: 5;");
                     winnerLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #b45309;");
                 }
@@ -429,6 +444,32 @@ public class BiddingController {
         if (clockTimeline != null) clockTimeline.stop();
         try { SceneManager.switchTo("Dashboard.fxml"); }
         catch (Exception e) { e.printStackTrace(); }
+    }
+
+    @FXML
+    public void handlePay() {
+        if (payBtn != null) payBtn.setDisable(true);
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                JsonObject payload = new JsonObject();
+                payload.addProperty("auctionId", currentAuctionId);
+                Request  req = new Request(CommandType.PAY_AUCTION, payload.toString());
+                Response res = client.send(req);
+                Platform.runLater(() -> {
+                    if (res.isOk()) {
+                        AlertUtil.info("Thành công", "Xác nhận thanh toán thành công!");
+                    } else {
+                        if (payBtn != null) payBtn.setDisable(false);
+                        AlertUtil.error("Lỗi", res.getData());
+                    }
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    if (payBtn != null) payBtn.setDisable(false);
+                    AlertUtil.error("Lỗi kết nối", e.getMessage());
+                });
+            }
+        });
     }
 
     private void showError(String msg) {

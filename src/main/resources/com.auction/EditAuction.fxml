@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<VBox spacing="15" alignment="CENTER"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.auction.controller.EditAuctionController"
+      stylesheets="@style.css"
+      styleClass="root"
+      style="-fx-padding: 40; -fx-min-width: 500; -fx-min-height: 550;">
+
+    <HBox alignment="CENTER_LEFT" maxWidth="450">
+        <Button text="← Quay lại" onAction="#handleBack" styleClass="button-secondary" prefHeight="35"/>
+        <Region HBox.hgrow="ALWAYS"/>
+    </HBox>
+
+    <VBox alignment="CENTER" spacing="15" styleClass="card" maxWidth="450">
+        <Label text="SỬA PHIÊN ĐẤU GIÁ" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+        
+        <VBox spacing="5">
+            <Label text="Tên sản phẩm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+            <TextField fx:id="nameField" promptText="Nhập tên sản phẩm..." prefHeight="35"/>
+        </VBox>
+
+        <VBox spacing="5">
+            <Label text="Mô tả" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+            <TextField fx:id="descField" promptText="Nhập mô tả sản phẩm..." prefHeight="35"/>
+        </VBox>
+        
+        <HBox spacing="10">
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Giá khởi điểm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+                <TextField fx:id="priceField" promptText="VD: 500000" prefHeight="35"/>
+            </VBox>
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Loại sản phẩm" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+                <!-- Không cho phép sửa loại sản phẩm vì nó liên quan đến Object Type -->
+                <ComboBox fx:id="typeCombo" promptText="Chọn loại..." prefHeight="35" maxWidth="Infinity" disable="true"/>
+            </VBox>
+        </HBox>
+
+        <VBox spacing="5">
+            <Label text="Ngày kết thúc" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+            <DatePicker fx:id="endDatePicker" prefHeight="35" maxWidth="Infinity"/>
+        </VBox>
+
+        <HBox spacing="10">
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Giờ" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+                <Spinner fx:id="hourSpinner" prefHeight="35" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Phút" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+                <Spinner fx:id="minuteSpinner" prefHeight="35" maxWidth="Infinity"/>
+            </VBox>
+        </HBox>
+
+        <Button text="LƯU THAY ĐỔI" onAction="#handleSave"
+                styleClass="button" prefWidth="400" prefHeight="40"/>
+
+        <Label fx:id="resultLabel" wrapText="true" textAlignment="CENTER"/>
+    </VBox>
+</VBox>

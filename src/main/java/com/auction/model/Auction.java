@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Auction extends Entity {
 
-    public enum Status { OPEN, RUNNING, FINISHED, CANCELED }
+    public enum Status { OPEN, RUNNING, FINISHED, CANCELED, PAID }
 
     // ★ Anti-sniping constants (dễ config)
     public static final long SNIPE_WINDOW_SECONDS    = 60; // X giây cuối trước endTime

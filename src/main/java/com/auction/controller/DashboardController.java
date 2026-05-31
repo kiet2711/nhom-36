@@ -256,7 +256,7 @@ public class DashboardController {
         try {
             stopTimelines();
             client.setPushListener(null); // clear push listener trước khi chuyển màn
-            BiddingController ctrl = SceneManager.switchToAndGetController("Bidding.fxml");
+            ItemDetailController ctrl = SceneManager.switchToAndGetController("ItemDetail.fxml");
             ctrl.loadAuction(selected);
         } catch (Exception e) {
             AlertUtil.error("Lỗi", "Không thể mở màn hình: " + e.getMessage());
